@@ -1,0 +1,33 @@
+{
+  "name": "slimmy",
+  "version": "0.1.0",
+  "description": "Haml to Slim converter, written in coffeescript...",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "gulp --require coffee-script/register mocha:ci"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/s0ber/slimmy.git"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "coffee-script": "~1.7.1",
+    "mocha": "~1.18.2",
+    "chai": "~1.9.1",
+    "sinon": "~1.9.1",
+    "sinon-chai": "~2.5.0",
+    "gulp": "~3.6.2",
+    "gulp-util": "~2.2.14",
+    "gulp-coffee": "~1.4.3",
+    "gulp-watch": "~0.6.5",
+    "gulp-mocha": "~0.4.1",
+    "coffeegulp": "~0.0.4"
+  },
+  "author": "Sergey Shishkalov <sergeyshishkalov@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/s0ber/slimmy/issues"
+  }
+}
