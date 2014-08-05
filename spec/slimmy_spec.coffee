@@ -1,9 +1,9 @@
-Main = require('../src/main')
+Slimmy = require('../src/slimmy')
 
-describe 'Main', ->
+describe 'Slimmy', ->
 
   beforeEach ->
-    @object = new Main()
+    @object = new Slimmy()
 
   describe '#contructor', ->
     it 'sets @property to true', ->

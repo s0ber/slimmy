@@ -2,7 +2,7 @@
   "name": "slimmy",
   "version": "0.1.0",
   "description": "Haml to Slim converter, written in coffeescript...",
-  "main": "lib/index.js",
+  "main": "lib/slimmy.js",
   "scripts": {
     "test": "gulp --require coffee-script/register mocha:ci"
   },

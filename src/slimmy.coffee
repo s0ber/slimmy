@@ -1,6 +1,6 @@
-Main = class
+Slimmy = class
 
   constructor: ->
     @property = true
 
-module.exports = Main
+module.exports = Slimmy

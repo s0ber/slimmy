@@ -5,7 +5,7 @@ gutil = require('gulp-util')
 coffee = require('gulp-coffee')
 
 sourceFiles = [
-  'src/index.coffee'
+  'src/slimmy.coffee'
   'src/**/*.coffee'
 ]
 
