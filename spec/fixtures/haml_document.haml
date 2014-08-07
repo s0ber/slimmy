@@ -17,7 +17,6 @@
     - elsif current_role.is_a?(TalentPartner)
       Developer is available 9am&mdash;5pm Moscow Time, Monday&mdash;Thursday.
 
-
 = neo_form_for @interview, url: reject_time_interview_path(@interview), modifier: ['modal', 'single_field'] do |f|
   = f.input :comment, as: :text, required: true, placeholder: 'Please leave a comment'
   = f.hidden_field :lock_version
