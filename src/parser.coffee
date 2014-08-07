@@ -33,9 +33,12 @@ class Parser
     dfd.promise
 
   _hamlParseCmd: (filePath) ->
-    isAbsolutePath = filePath[0] is '/' or filePath[0] is '~'
-    filePath = "./../#{filePath}" unless isAbsolutePath
+    converterPath = "#{__dirname}/../bin/haml_json_converter.rb"
 
-    "ruby ./../bin/haml_slim_converter.rb #{filePath}"
+    isAbsolutePath = filePath[0] is '/' or filePath[0] is '~'
+    unless isAbsolutePath
+      filePath = "#{__dirname}/../#{filePath}"
+
+    "ruby #{converterPath} #{filePath}"
 
 module.exports = Parser

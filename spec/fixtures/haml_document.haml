@@ -1,0 +1,27 @@
+%p
+  - if current_role.is_a?(Developer)
+    Please tell the company when you are available.
+  - elsif current_role.is_a?(TalentPartner)
+    Please tell the company when your developer is available.
+
+  If suggested time meets company schedule you will receive notification on new interview time.
+
+%p
+  Being as flexible as possible is ideal. Please specify days and time.
+
+%p
+  %b Example:
+  %i
+    - if current_role.is_a?(Developer)
+      I am available 9am&mdash;5pm Moscow Time, Monday&mdash;Thursday.
+    - elsif current_role.is_a?(TalentPartner)
+      Developer is available 9am&mdash;5pm Moscow Time, Monday&mdash;Thursday.
+
+
+= neo_form_for @interview, url: reject_time_interview_path(@interview), modifier: ['modal', 'single_field'] do |f|
+  = f.input :comment, as: :text, required: true, placeholder: 'Please leave a comment'
+  = f.hidden_field :lock_version
+
+  .modal__buttons
+    .big_button.is-cancel.js-close_modal Cancel
+    %button.big_button.is-red{type: 'submit'} Reject Time

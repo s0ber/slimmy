@@ -7,7 +7,16 @@ describe 'Parser', ->
     @parser = new Parser()
     @parser.AstNode = sinon.spy()
 
-    @rootNodeJson = {a: 1, b: 2, c: 3, children: [{a: 2}, {a: 3}, {b:3}]}
+    @rootNodeJson =
+      type: 'root',
+      data:
+        {a: 1, b: 2, c: 3}
+      children: [
+        {type: 'tag', data: {a: 2}, children: []}
+        {type: 'tag', data: {a: 3}, children: []}
+        {type: 'tag', data: {b: 3}, children: []}
+      ]
+
     @parser._execHamlParsing = (filePath) =>
       dfd = Q.defer()
       dfd.resolve(@rootNodeJson)
@@ -36,8 +45,8 @@ describe 'Parser', ->
       expect(@parser._AstNode().lastCall.args).to.be.eql [a:1, b: 2, c: 3]
 
   describe '#_execHamlParsing', ->
-    xit 'parses file with ruby haml gem parser', ->
+    it 'parses file with ruby haml gem parser', ->
       parser = new Parser()
-      parser.parseFile('./fixtures/haml_document.haml').then (result) =>
+      parser._execHamlParsing('./spec/fixtures/haml_document.haml').then (result) =>
         console.log result
 
