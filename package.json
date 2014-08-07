@@ -11,6 +11,7 @@
     "url": "git://github.com/s0ber/slimmy.git"
   },
   "dependencies": {
+    "q": ""
   },
   "devDependencies": {
     "coffee-script": "~1.7.1",

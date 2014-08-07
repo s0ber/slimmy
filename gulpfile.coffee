@@ -28,7 +28,8 @@ gulp.task 'mocha:dev', ->
     .pipe(watch(emit: 'all', (files) ->
       files
         .pipe(mocha(ui: 'bdd'))
-        .on 'error', (err) ->
+        .on 'error', (err, res) ->
+          console.log(err.toString())
           console.log(err.stack)
           @emit('end')
     ))
