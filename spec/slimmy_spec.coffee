@@ -22,13 +22,13 @@ describe 'Slimmy', ->
     @slimmy.Compiler = class
       compile: (rootNode) ->
 
+    sinon.spy(@slimmy, 'Compiler')
     sinon.spy(@slimmy.Compiler::, 'compile')
 
   describe '#convert', ->
     it 'at first parses provided file and then compiles slim from recieved ASTree', ->
       @slimmy.convert('./fixtures/haml_document.haml')
       expect(@slimmy.Parser::parseFile).to.be.calledOnce
+      expect(@slimmy.Compiler.lastCall.args).to.be.eql [@rootNode]
       expect(@slimmy.Compiler::compile).to.be.calledOnce
-
       expect(@slimmy.Compiler::compile).to.be.calledAfter @slimmy.Parser::parseFile
-      expect(@slimmy.Compiler::compile.lastCall.args).to.be.eql [@rootNode]

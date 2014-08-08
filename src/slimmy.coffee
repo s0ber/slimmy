@@ -8,8 +8,9 @@ Slimmy = class
   Compiler: Compiler
 
   convert: (filePath) ->
-    compiler = new @Compiler()
-    slimCode = compiler.compile(@parser().parseFile(filePath))
+    rootNode = @parser().parseFile(filePath)
+    compiler = new @Compiler(rootNode)
+    compiler.compile()
 
   parser: ->
     @_parser ?= new @Parser()
