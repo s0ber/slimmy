@@ -17,10 +17,12 @@ class Parser
 
     rootNode
 
-  setChildrenForAstNode: (node, childrenData) ->
+  setChildrenForAstNode: (node, childrenData = []) ->
     node.children ?= []
     for childData in childrenData
-      node.children.push(@convertDataToAstNode(childData))
+      childNode = @convertDataToAstNode(childData)
+      node.children.push(childNode)
+      @setChildrenForAstNode(childNode, childData.children)
 
   convertDataToAstNode: (data) ->
     new @AstNode(data)
