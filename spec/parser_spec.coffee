@@ -26,23 +26,26 @@ describe 'Parser', ->
     it 'returns AstNode, which is root node of AST for given file', ->
       @parser.parseFile('./fixtures/haml_document.haml').then (rootNode) =>
         expect(@parser.AstNode).to.be.called.once
-        expect(@parser.AstNode.lastCall.args).to.be.eql [@rootNodeJson]
+        expect(@parser.AstNode.firstCall.args).to.be.eql [@rootNodeJson]
 
         expect(rootNode).to.be.instanceOf(@parser.AstNode)
 
   describe '#buildASTree', ->
-    xit 'creates tree of AstNode objects', ->
+    it 'creates tree of AstNode objects', ->
       data = {a: 1, children: [{a: 2}, {a: 3}, {a:4}]}
 
       result = @parser.buildASTree(data)
-      expect(result.constructor).to.match /AstNode/
-      expect(result.children[0]).to.match /AstNode/
+      expect(result).to.be.instanceof(@parser.AstNode)
+      expect(result.children[0]).to.be.instanceof(@parser.AstNode)
 
   describe '#convertDataToAstNode', ->
-    xit 'converts json object to AstNode object', ->
-      @parser.convertDataToAstNode(@rootNodeJson)
-      expect(@parser._AstNode()).to.be.calledOnce
-      expect(@parser._AstNode().lastCall.args).to.be.eql [a:1, b: 2, c: 3]
+    it 'converts json object to AstNode object', ->
+      node = @parser.convertDataToAstNode(@rootNodeJson)
+      expect(node).to.be.instanceOf(@parser.AstNode)
+
+    it 'provides data to AstNode constructor', ->
+      node = @parser.convertDataToAstNode(@rootNodeJson)
+      expect(@parser.AstNode.lastCall.args).to.be.eql [@rootNodeJson]
 
   describe '#_execHamlParsing', ->
     it 'parses file with ruby haml gem parser', ->

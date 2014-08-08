@@ -12,7 +12,15 @@ class Parser
       @buildASTree(data)
 
   buildASTree: (data) ->
-    @convertDataToAstNode(data)
+    rootNode = @convertDataToAstNode(data)
+    @setChildrenForAstNode(rootNode, data.children)
+
+    rootNode
+
+  setChildrenForAstNode: (node, childrenData) ->
+    node.children ?= []
+    for childData in childrenData
+      node.children.push(@convertDataToAstNode(childData))
 
   convertDataToAstNode: (data) ->
     new @AstNode(data)
