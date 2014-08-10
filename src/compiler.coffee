@@ -1,10 +1,24 @@
+INDENTATION = "  "
+IND_LEVEL = 0
+LINE_BREAK = '\n'
+
 class Compiler
 
   constructor: (rootNode) ->
     @root = rootNode
     @buffer = ''
 
-  compileNode: (node) ->
+  compile: ->
+    @compileNode(@root, IND_LEVEL)
+    @compileChildrenNodes(@root, IND_LEVEL)
+
+  compileChildrenNodes: (node, indLevel) ->
+    return unless node.children
+    for child in node.children
+      @compileNode(child, indLevel)
+      @compileChildrenNodes(child, indLevel + 1)
+
+  compileNode: (node, indLevel) ->
     compilationMethod = switch node.type
       when 'root'
         'compileRoot'
@@ -24,25 +38,35 @@ class Compiler
         'compileDoctype'
       when 'filter'
         'compileFilter'
+      when 'spec'
+        'compileSpec'
 
-    @[compilationMethod](node)
+    return unless compilationMethod
 
-  compileRoot: (node) ->
+    @[compilationMethod](node, indLevel)
 
-  compilePlain: (node) ->
+  compileRoot: (node, indLevel) ->
 
-  compileScript: (node) ->
+  compilePlain: (node, indLevel) ->
 
-  compileSilentScript: (node) ->
+  compileScript: (node, indLevel) ->
 
-  compileHamlComment: (node) ->
+  compileSilentScript: (node, indLevel) ->
 
-  compileTag: (node) ->
+  compileHamlComment: (node, indLevel) ->
 
-  compileComment: (node) ->
+  compileTag: (node, indLevel) ->
 
-  compileDoctype: (node) ->
+  compileComment: (node, indLevel) ->
 
-  compileFilter: (node) ->
+  compileDoctype: (node, indLevel) ->
+
+  compileFilter: (node, indLevel) ->
+
+  compileSpec: (node, indLevel) ->
+    @buffer += @getIndent(indLevel) + node.data.text + LINE_BREAK
+
+  getIndent: (indLevel) ->
+    if indLevel then Array(indLevel + 1).join(INDENTATION) else ''
 
 module.exports = Compiler
