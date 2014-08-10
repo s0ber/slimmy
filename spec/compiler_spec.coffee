@@ -35,16 +35,16 @@ describe 'Compiler', ->
     it 'compiles provided ASTree into slim code string', ->
       @compiler.compile()
       expect(@compiler.buffer).to.be.equal """
-                                           .test_el
-                                             .test_inner_el_1
-                                             .test_inner_el_2
-                                               .test_inner_el_3
-                                             .test_another_el_1
-                                             .test_another_el_2
-                                               .test_another_el_3
-                                               .test_another_el_4
+        .test_el
+          .test_inner_el_1
+          .test_inner_el_2
+            .test_inner_el_3
+          .test_another_el_1
+          .test_another_el_2
+            .test_another_el_3
+            .test_another_el_4
 
-                                           """
+        """
 
   describe '#compileNode', ->
     context 'node is root node', ->
@@ -53,7 +53,11 @@ describe 'Compiler', ->
           sinon.spy(@compiler, 'compileRoot')
           @compiler.compileNode(type: 'root')
         catch e
-        expect(@compiler.compileRoot).to.be.calledOnce
+          expect(@compiler.compileRoot).to.be.calledOnce
+
+      it 'compiles nothing', ->
+        @compiler.compileRoot(type: 'root', data: {text: 'Some text'})
+        expect(@compiler.buffer).to.be.eql ''
 
     context 'node is plain text node', ->
       it 'calls @compilePlain node', ->
@@ -63,6 +67,13 @@ describe 'Compiler', ->
         catch e
           expect(@compiler.compilePlain).to.be.calledOnce
 
+      it 'compiles base on node.data.text value', ->
+        @compiler.compilePlain
+          type: 'plain'
+          data: {text: 'Some text'}
+
+        expect(@compiler.buffer).to.be.eql '| Some text\n'
+
     context 'node is script node', ->
       it 'calls @compileScript node', ->
         try
@@ -70,6 +81,14 @@ describe 'Compiler', ->
           @compiler.compileNode(type: 'script')
         catch e
           expect(@compiler.compileScript).to.be.calledOnce
+
+      it 'compiles proper slim string for script evaluation', ->
+        @compiler.compileScript
+          type: 'script',
+          data:
+            text: ' link_to title, path, class: "menu-item js-app-menu_item #{\'is-active\' if current_page}", data: {menu_item_id: options[:menu_item_id]}'
+
+        expect(@compiler.buffer).to.be.eql '= link_to title, path, class: "menu-item js-app-menu_item #{\'is-active\' if current_page}\", data: {menu_item_id: options[:menu_item_id]}\n'
 
     context 'node is silent script node', ->
       it 'calls @compileSilentScript node', ->
@@ -79,6 +98,22 @@ describe 'Compiler', ->
         catch e
           expect(@compiler.compileSilentScript).to.be.calledOnce
 
+      it 'compiles proper slim string for silent script evaluation', ->
+        @compiler.compileSilentScript
+          type: 'silent_script'
+          data:
+            text: ' menu_items.each do |title, path, options = {}|'
+
+        expect(@compiler.buffer).to.be.eql '- menu_items.each do |title, path, options = {}|\n'
+
+      it 'compiles empty string, if it is "EMPTY_LINE" comment', ->
+        @compiler.compileSilentScript
+          type: 'silent_script'
+          data:
+            text: ' # EMPTY_LINE'
+
+        expect(@compiler.buffer).to.be.eql '\n'
+
     context 'node is haml comment node', ->
       it 'calls @compileHamlComment node', ->
         try
@@ -87,6 +122,8 @@ describe 'Compiler', ->
         catch e
           expect(@compiler.compileHamlComment).to.be.calledOnce
 
+      it 'compiles proper slim string for comment', ->
+
     context 'node is tag node', ->
       it 'calls @compileTag node', ->
         try
@@ -94,6 +131,36 @@ describe 'Compiler', ->
           @compiler.compileNode(type: 'tag')
         catch e
           expect(@compiler.compileTag).to.be.calledOnce
+
+      it 'compiles proper slim string for tag without id or classes', ->
+        @compiler.compileTag
+          "type": "tag",
+          "data":
+            "name": "span"
+            "attributes": {}
+            "attributes_hashes": [
+              "class: 'my_class', data: {attr: 'value', another_attr: 'another_value'}"
+            ]
+
+        expect(@compiler.buffer).to.be.equal """
+          span class='my_class' data={attr: 'value', another_attr: 'another_value'}\n
+          """
+
+      it 'compiles proper slim string for tag with id or classes', ->
+        @compiler.compileTag
+          "type": "tag",
+          "data":
+            "name": "div"
+            "attributes":
+              "id": "unique"
+              "class": "page js-app-page_wrapper"
+            "attributes_hashes": [
+              "class: 'my_class', data: {attr: 'value', another_attr: 'another_value'}"
+            ]
+
+        expect(@compiler.buffer).to.be.equal """
+          #unique.page.js-app-page_wrapper class='my_class' data={attr: 'value', another_attr: 'another_value'}\n
+          """
 
     context 'node is comment node', ->
       it 'calls @compileComment node', ->
@@ -134,3 +201,16 @@ describe 'Compiler', ->
           data: {text: 'OLOLO'}
 
         expect(@compiler.buffer).to.be.equal 'OLOLO\n'
+
+  describe '#compileAttrsHash', ->
+    it 'compiles attributes hashes into slim format', ->
+      hashes = [
+        "class: 'my_class', data: {attr: 'value', another_attr: 'another_value'}"
+        "class: 'my_class',\ndata: {attr: 'value',\nanother_attr: 'another_value'}"
+      ]
+
+      expect(@compiler.compileAttrsHashes(hashes)).to.be.eql [
+        "class='my_class' data={attr: 'value', another_attr: 'another_value'}",
+        "class='my_class' data={attr: 'value', another_attr: 'another_value'}"
+      ]
+
