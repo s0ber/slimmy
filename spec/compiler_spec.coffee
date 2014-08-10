@@ -162,6 +162,24 @@ describe 'Compiler', ->
           #unique.page.js-app-page_wrapper class='my_class' data={attr: 'value', another_attr: 'another_value'}\n
           """
 
+      it 'compiles ineer text on the next line, if it exists', ->
+        @compiler.compileTag
+          "type": "tag",
+          "data":
+            "name": "div"
+            "attributes":
+              "id": "unique"
+              "class": "page js-app-page_wrapper"
+            "attributes_hashes": [
+              "class: 'my_class', data: {attr: 'value', another_attr: 'another_value'}"
+            ]
+            "text": "Some text here."
+
+        expect(@compiler.buffer).to.be.equal """
+          #unique.page.js-app-page_wrapper class='my_class' data={attr: 'value', another_attr: 'another_value'}
+            | Some text here.\n
+          """
+
     context 'node is comment node', ->
       it 'calls @compileComment node', ->
         try
@@ -169,6 +187,22 @@ describe 'Compiler', ->
           @compiler.compileNode(type: 'comment')
         catch e
           expect(@compiler.compileComment).to.be.calledOnce
+
+      it 'compiles node as html comment', ->
+        @compiler.compileComment
+          type: 'comment'
+          data:
+            text: 'Some comment here'
+
+        expect(@compiler.buffer).to.be.eql('/! Some comment here\n')
+
+      it 'compiles node as html comment even if not text provided', ->
+        @compiler.compileComment
+          type: 'comment'
+          data:
+            text: ''
+
+        expect(@compiler.buffer).to.be.eql('/!\n')
 
     context 'node is doctype node', ->
       it 'calls @compileDoctype node', ->
@@ -178,6 +212,14 @@ describe 'Compiler', ->
         catch e
           expect(@compiler.compileDoctype).to.be.calledOnce
 
+      it 'compiles proper slim doctype', ->
+        @compiler.compileDoctype
+          "type": "doctype"
+          "data":
+            "version": "5"
+
+        expect(@compiler.buffer).to.be.eql 'doctype html\n'
+
     context 'node is filter node', ->
       it 'calls @compileFilter node', ->
         try
@@ -185,6 +227,20 @@ describe 'Compiler', ->
           @compiler.compileNode(type: 'filter')
         catch e
           expect(@compiler.compileFilter).to.be.calledOnce
+
+      it 'compiles slim filter with proper indentation', ->
+        @compiler.compileFilter
+          "type": "filter"
+          "data":
+            "name": "sass"
+            "text": ".my_class.is-blue\n  color: blue\n\n"
+
+        expect(@compiler.buffer).to.be.equal """
+          :sass
+            .my_class.is-blue
+              color: blue
+          \n
+        """
 
     context 'node is spec node', ->
       it 'calls @compileSpec node', ->

@@ -83,11 +83,41 @@ class Compiler
     @buffer += @getIndent(indLevel) + tag + ' '
     @buffer += @compileAttrsHashes(node.data.attributes_hashes).join(' ') + LINE_BREAK
 
+    if node.data.text
+      @buffer += @getIndent(indLevel) + INDENTATION + '| ' + node.data.text + LINE_BREAK
+
   compileComment: (node, indLevel) ->
+    @buffer += @getIndent(indLevel) + '/!'
+    @buffer += " #{node.data.text}" if node.data.text
+    @buffer += LINE_BREAK
 
   compileDoctype: (node, indLevel) ->
+    doctype =
+      if node.data.version is '5'
+        'doctype html'
+      else if node.data.version is '1.1'
+        'doctype 1.1'
+      else if node.data.type is 'strict'
+        'doctype strict'
+      else if node.data.type is 'frameset'
+        'doctype frameset'
+      else if node.data.type is 'mobile'
+        'doctype mobile'
+      else if node.data.type is 'basic'
+        'doctype basic'
+      else
+        'doctype transitional'
+
+    @buffer += @getIndent(indLevel) + doctype + LINE_BREAK
 
   compileFilter: (node, indLevel) ->
+    filterStringFormatted = ''
+    strings = _.compact(node.data.text.split('\n'))
+    strings = _.map strings, (string) =>
+      @getIndent(indLevel) + INDENTATION + string
+
+    @buffer += @getIndent(indLevel) + ":#{node.data.name}" + LINE_BREAK
+    @buffer += strings.join(LINE_BREAK) + LINE_BREAK + LINE_BREAK
 
   compileSpec: (node, indLevel) ->
     @buffer += @getIndent(indLevel) + node.data.text + LINE_BREAK
