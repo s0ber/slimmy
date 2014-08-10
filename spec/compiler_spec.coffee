@@ -90,6 +90,14 @@ describe 'Compiler', ->
 
         expect(@compiler.buffer).to.be.eql '= link_to title, path, class: "menu-item js-app-menu_item #{\'is-active\' if current_page}\", data: {menu_item_id: options[:menu_item_id]}\n'
 
+      it 'compiles text string with interpolated ruby code if script is a string', ->
+        @compiler.compileScript
+          "type": "script"
+          "data":
+            "text": '"Some #{a} here."'
+
+        expect(@compiler.buffer).to.be.eql 'Some #{a} here.\n'
+
     context 'node is silent script node', ->
       it 'calls @compileSilentScript node', ->
         try
@@ -106,13 +114,16 @@ describe 'Compiler', ->
 
         expect(@compiler.buffer).to.be.eql '- menu_items.each do |title, path, options = {}|\n'
 
-      it 'compiles empty string, if it is "EMPTY_LINE" comment', ->
+      it 'adds empty line if silent script is a comment', ->
         @compiler.compileSilentScript
           type: 'silent_script'
           data:
-            text: ' # EMPTY_LINE'
+            text: ' # it is comment'
 
-        expect(@compiler.buffer).to.be.eql '\n'
+        expect(@compiler.buffer).to.be.eql """
+
+        - # it is comment\n
+        """
 
     context 'node is haml comment node', ->
       it 'calls @compileHamlComment node', ->
@@ -162,7 +173,7 @@ describe 'Compiler', ->
           #unique.page.js-app-page_wrapper class='my_class' data={attr: 'value', another_attr: 'another_value'}\n
           """
 
-      it 'compiles ineer text on the next line, if it exists', ->
+      it 'compiles inner text on the next line, if it exists', ->
         @compiler.compileTag
           "type": "tag",
           "data":
@@ -173,10 +184,29 @@ describe 'Compiler', ->
             "attributes_hashes": [
               "class: 'my_class', data: {attr: 'value', another_attr: 'another_value'}"
             ]
-            "text": "Some text here."
+            "value": "Some text here."
 
         expect(@compiler.buffer).to.be.equal """
           #unique.page.js-app-page_wrapper class='my_class' data={attr: 'value', another_attr: 'another_value'}
+            | Some text here.\n
+          """
+
+      it 'prepends string with line break, if it is main tag', ->
+        @compiler.compileTag
+          "type": "tag",
+          "data":
+            "name": "body"
+            "attributes":
+              "id": "unique"
+              "class": "page js-app-page_wrapper"
+            "attributes_hashes": [
+              "class: 'my_class', data: {attr: 'value', another_attr: 'another_value'}"
+            ]
+            "value": "Some text here."
+
+        expect(@compiler.buffer).to.be.equal """
+
+          body#unique.page.js-app-page_wrapper class='my_class' data={attr: 'value', another_attr: 'another_value'}
             | Some text here.\n
           """
 

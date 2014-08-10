@@ -51,4 +51,4 @@ describe 'Parser', ->
     it 'parses file with ruby haml gem parser', ->
       parser = new Parser()
       parser._execHamlParsing('./spec/fixtures/haml_document.haml').then (result) =>
-        console.log result
+        # console.log result

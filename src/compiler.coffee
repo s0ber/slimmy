@@ -3,6 +3,7 @@ _ = require 'underscore'
 INDENTATION = "  "
 IND_LEVEL = 0
 LINE_BREAK = '\n'
+MAIN_TAGS = 'body footer'.split(' ')
 
 class Compiler
 
@@ -54,12 +55,20 @@ class Compiler
     @buffer += @getIndent(indLevel) + '| ' + node.data.text + LINE_BREAK
 
   compileScript: (node, indLevel) ->
-    @buffer += @getIndent(indLevel) + '=' + node.data.text + LINE_BREAK
+    scriptLen = node.data.text.length
+    isInterpolatedString = node.data.text[0] is '"' and node.data.text[scriptLen - 1] is '"'
+
+    if isInterpolatedString
+      @buffer += @getIndent(indLevel) + node.data.text.substr(1, scriptLen - 2) + LINE_BREAK
+    else
+      @buffer += @getIndent(indLevel) + '=' + node.data.text + LINE_BREAK
 
   compileSilentScript: (node, indLevel) ->
     if /# EMPTY_LINE/.test(node.data.text)
       @buffer += '\n'
     else
+      isComment = /^ #/.test(node.data.text)
+      @buffer += '\n' if isComment
       @buffer += @getIndent(indLevel) + '-' + node.data.text + LINE_BREAK
 
   compileHamlComment: (node, indLevel) ->
@@ -80,11 +89,13 @@ class Compiler
       else if key is 'id'
         tag += '#' + value
 
+    isMainTag = MAIN_TAGS.indexOf(node.data.name) isnt -1
+    @buffer += LINE_BREAK if isMainTag
     @buffer += @getIndent(indLevel) + tag + ' '
     @buffer += @compileAttrsHashes(node.data.attributes_hashes).join(' ') + LINE_BREAK
 
-    if node.data.text
-      @buffer += @getIndent(indLevel) + INDENTATION + '| ' + node.data.text + LINE_BREAK
+    if node.data.value
+      @buffer += @getIndent(indLevel) + INDENTATION + '| ' + node.data.value + LINE_BREAK
 
   compileComment: (node, indLevel) ->
     @buffer += @getIndent(indLevel) + '/!'
@@ -128,13 +139,18 @@ class Compiler
   compileAttrsHashes: (hashes = []) ->
     hashes = _.map hashes, (attributesHash) ->
       attributesHash = attributesHash.replace(/\n/g, ' ')
-      dataAttrs = attributesHash.match(/data: {(.+)}/)[1]
-      attributesHash = attributesHash.replace(dataAttrs, '')
+      dataAttrs = attributesHash.match(/data: {(.+)}/)?[1]
+      attributesHash = attributesHash.replace(dataAttrs, '') if dataAttrs?
 
       items =
         for item in attributesHash.split(', ')
           item.replace(/(\w+): /, "$1=")
-      attributesHash = items.join(' ').replace('data={}', "data={#{dataAttrs}}")
+
+      attributesHash = items.join(' ')
+
+      if dataAttrs?
+        attributesHash = attributesHash.replace('data={}', "data={#{dataAttrs}}")
+
       attributesHash
 
     hashes

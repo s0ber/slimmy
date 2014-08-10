@@ -1,4 +1,5 @@
 Slimmy = require('../src/slimmy')
+Q = require 'q'
 
 describe 'Slimmy', ->
 
@@ -15,7 +16,10 @@ describe 'Slimmy', ->
 
     @slimmy = new Slimmy()
     @slimmy.Parser = class
-      parseFile: (filePath) -> rootNode
+      parseFile: (filePath) ->
+        dfd = Q.defer()
+        dfd.resolve(rootNode)
+        dfd.promise
 
     sinon.spy(@slimmy.Parser::, 'parseFile')
 
@@ -27,8 +31,16 @@ describe 'Slimmy', ->
 
   describe '#convert', ->
     it 'at first parses provided file and then compiles slim from recieved ASTree', ->
-      @slimmy.convert('./fixtures/haml_document.haml')
-      expect(@slimmy.Parser::parseFile).to.be.calledOnce
-      expect(@slimmy.Compiler.lastCall.args).to.be.eql [@rootNode]
-      expect(@slimmy.Compiler::compile).to.be.calledOnce
-      expect(@slimmy.Compiler::compile).to.be.calledAfter @slimmy.Parser::parseFile
+      @slimmy.convert('./fixtures/haml_document.haml').then =>
+        expect(@slimmy.Parser::parseFile).to.be.calledOnce
+        expect(@slimmy.Compiler.lastCall.args).to.be.eql [@rootNode]
+        expect(@slimmy.Compiler::compile).to.be.calledOnce
+        expect(@slimmy.Compiler::compile).to.be.calledAfter @slimmy.Parser::parseFile
+
+    # not actual test case, just printing compiled (to slim) haml document to console
+    it 'logs compiled fixture to concole', ->
+      slimmy = new Slimmy()
+      slimmy.convert('./spec/fixtures/haml_document.haml').then ->
+        console.log('\n')
+        console.log(slimmy._compilationResults)
+
