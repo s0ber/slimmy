@@ -22,13 +22,16 @@ gulp.task 'release', ['mocha:ci'], ->
 gulp.task 'mocha:ci', ->
   gulp.src(specFiles, read: false)
     .pipe(mocha(ui: 'bdd'))
+    .on 'error', (err) ->
+      console.log(err.stack)
+      process.exit(1)
 
 gulp.task 'mocha:dev', ->
   gulp.src(specFiles, read: false)
     .pipe(watch(emit: 'all', (files) ->
       files
         .pipe(mocha(ui: 'bdd'))
-        .on 'error', (err, res) ->
+        .on 'error', (err) ->
           console.log(err.toString())
           console.log(err.stack)
           @emit('end')
