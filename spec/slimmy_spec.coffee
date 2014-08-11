@@ -36,7 +36,7 @@ describe 'Slimmy', ->
       slimmy = new Slimmy()
 
       sinon.spy(slimmy, 'convert')
-      slimmy.convertDir('./spec/fixtures/folder', true).then ->
+      slimmy.convertDir('./spec/fixtures/folder').then ->
         expect(slimmy.convert.callCount).to.be.equal(filesNumber)
 
   describe '#convert', ->
