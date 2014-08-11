@@ -35,8 +35,9 @@ Slimmy = class
           next()
     )
 
+    console.log "Converting files:"
     Q.all(_.map(files, (file) =>
-      console.log "Converting file:\n#{file}"
+      console.log(file)
       @convert(file, writeToFile)
     ))
 
