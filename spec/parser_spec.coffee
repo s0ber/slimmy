@@ -24,7 +24,7 @@ describe 'Parser', ->
 
   describe '#parseFile', ->
     it 'returns AstNode, which is root node of AST for given file', ->
-      @parser.parseFile('./fixtures/haml_document.haml').then (rootNode) =>
+      @parser.parseFile('./spec/fixtures/haml_document.haml').then (rootNode) =>
         expect(@parser.AstNode).to.be.called.once
         expect(@parser.AstNode.firstCall.args).to.be.eql [@rootNodeJson]
 

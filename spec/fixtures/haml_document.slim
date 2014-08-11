@@ -1,0 +1,119 @@
+doctype html
+html
+  head
+    title
+      | Rails App Template
+    = stylesheet_link_tag 'application', media: 'all'
+    = javascript_include_tag 'application'
+    = csrf_meta_tags
+
+  body.layout data={app: 'app'}
+    .layout-main
+      header.layout-header data={view: 'header'}
+        .header
+          | History Widget Example In Haml Layout
+      .clearfix
+        section.layout-content
+          .layout-content_inner
+            .main_content
+              .page.js-app-page_wrapper
+                .page-title
+                  | Haml Layout Testing
+                .page-body
+
+                  - # Multiple lines attributes
+                  div class='my_class' data={attr: 'value', another_attr: 'another_value'}
+                    | Some text here.
+
+                  - # Html comment
+                  /! Some comment here
+
+                  - # Commented block of html
+                  /!
+                    p
+                      | This text is commented.
+
+                  - # Array defenition for classes
+                  div class=['my_class', 'my_another_class'] data={view: 'my_view'}
+                    | More text here.
+
+                  - # Text on nested level
+                  .my_class
+                    | And more text here.
+
+                  - # Text on the same level
+                  .my_class
+                    | And many more.
+
+                  - # Ruby code interpolation
+                  - a = 'text'
+                  .my_class
+                    Some #{a} here.
+
+                  - # Multiline text
+                  div
+                    p =h("I think this might get " + "pretty long so I should " + "probably make it " + "multiline so it doesn't " + "look awful.")
+                    div
+                      | This is short.
+
+                  - # Self-closing tag
+                  br
+
+                  - # Escaped char
+                  | = 5 + 5
+
+                  - # FILTERS
+                  :css
+                    .my_class.is-red {
+                      color: red
+                    }
+
+                  :javascript
+                    $('.page-body')
+                      .append('<div class="my_class is-blue">This #{a} is appended by js.</div>')
+
+                  - unescaped_text = '<span class="my_class is-red">unescaped html</span>'
+                  :javascript
+                    $('.page-body')
+                      .append('<div class="my_class">This text is appended by js and has some #{unescaped_text}, that should be \'.html_safe\' in slim.</div>')
+
+                  :plain
+                    This is a plain text list:<br>
+                      - item 1<br>
+                      - item 2<br>
+                      - item 3<br>
+                      ...<br>
+                      - item N<br>
+
+                  pre
+                    :preserve
+                      This is a preserved text list:
+                        - item 1
+                        - item 2
+                        - item 3
+
+        aside.layout-sidebar
+          .menu.js-app-menu
+            .menu-header
+              | Main menu
+            .menu-items
+
+              - # silent script
+              - menu_items.each do |title, path, options = {}|
+                - current_page = current_page?(path)
+
+                - # script
+                = link_to title, path, class: "menu-item js-app-menu_item #{'is-active' if current_page}", data: {menu_item_id: options[:menu_item_id]}
+                span =link_to title, path, class: "menu-item"
+      .layout-empty
+      - if true
+        span
+          | It was true
+      - else
+        span
+          | it was false...
+
+    footer.layout-footer
+      .layout-footer_inner
+        .footer
+          | Footer text here

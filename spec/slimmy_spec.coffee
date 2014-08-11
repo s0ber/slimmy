@@ -31,7 +31,7 @@ describe 'Slimmy', ->
 
   describe '#convert', ->
     it 'at first parses provided file and then compiles slim from recieved ASTree', ->
-      @slimmy.convert('./fixtures/haml_document.haml').then =>
+      @slimmy.convert('./spec/fixtures/haml_document.haml').then =>
         expect(@slimmy.Parser::parseFile).to.be.calledOnce
         expect(@slimmy.Compiler.lastCall.args).to.be.eql [@rootNode]
         expect(@slimmy.Compiler::compile).to.be.calledOnce
