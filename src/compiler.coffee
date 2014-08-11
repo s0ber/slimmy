@@ -4,6 +4,7 @@ INDENTATION = "  "
 IND_LEVEL = 0
 LINE_BREAK = '\n'
 MAIN_TAGS = 'body footer'.split(' ')
+MID_BLOCK_KEYWORDS = 'else elsif rescue ensure end when'.split(' ')
 
 class Compiler
 
@@ -69,7 +70,15 @@ class Compiler
     else
       isComment = /^ #/.test(node.data.text)
       @buffer += '\n' if isComment
-      @buffer += @getIndent(indLevel) + '-' + node.data.text + LINE_BREAK
+      isMidBlockKeyword = node.data.keyword? and MID_BLOCK_KEYWORDS.indexOf(node.data.keyword) isnt -1
+
+      indent =
+        if isMidBlockKeyword
+          @getIndent(indLevel - 1)
+        else
+          @getIndent(indLevel)
+
+      @buffer += indent + '-' + node.data.text + LINE_BREAK
 
   compileHamlComment: (node, indLevel) ->
 

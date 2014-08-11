@@ -127,6 +127,39 @@ describe 'Compiler', ->
         - # it is comment\n
         """
 
+      it 'works good with midlevel keywords', ->
+        node =
+          "type": "silent_script",
+          "data":
+            "text": " if true",
+            "keyword": "if",
+          "children": [
+            {"type": "tag",
+            "data":
+              "name": "span",
+              "value": "It was true"}
+            {"type": "silent_script",
+            "data":
+              "text": " else",
+              "keyword": "else"}
+            {"type": "tag",
+            "data":
+              "name": "span",
+              "value": "it was false..."}
+          ]
+
+        @compiler.compileNode(node, 0)
+        @compiler.compileChildrenNodes(node, 1)
+        expect(@compiler.buffer).to.be.equal """
+          - if true
+            span
+              | It was true
+          - else
+            span
+              | it was false...
+
+        """
+
     context 'node is haml comment node', ->
       it 'calls @compileHamlComment node', ->
         try
