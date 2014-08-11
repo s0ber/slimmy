@@ -209,6 +209,21 @@ describe 'Compiler', ->
           body#unique.page.js-app-page_wrapper class='my_class' data={attr: 'value', another_attr: 'another_value'}
             | Some text here.\n
           """
+      it 'works with multiline text strings', ->
+        @compiler.compileTag
+          "type": "tag",
+          "data":
+            "name": "p",
+            "parse": true,
+            "value": "h(                         \"I think this might get \" +  \"pretty long so I should \" + \"probably make it \" +        \"multiline so it doesn't \" + \"look awful.\" )"
+
+        expect(@compiler.buffer).to.be.equal """
+          p=h("I think this might get " + \
+          "pretty long so I should " + \
+          "probably make it " + \
+          "multiline so it doesn't " + \
+          "look awful.")\n
+          """
 
     context 'node is comment node', ->
       it 'calls @compileComment node', ->
@@ -293,10 +308,12 @@ describe 'Compiler', ->
       hashes = [
         "class: 'my_class', data: {attr: 'value', another_attr: 'another_value'}"
         "class: 'my_class',\ndata: {attr: 'value',\nanother_attr: 'another_value'}"
+        "class: ['my_class', 'my_another_class']"
       ]
 
       expect(@compiler.compileAttrsHashes(hashes)).to.be.eql [
         "class='my_class' data={attr: 'value', another_attr: 'another_value'}",
         "class='my_class' data={attr: 'value', another_attr: 'another_value'}"
+        "class=['my_class', 'my_another_class']"
       ]
 

@@ -36,7 +36,7 @@
                       This text is commented.
 
                   - # Array defenition for classes
-                  %div{class: ['my_class', 'my_another_class']}
+                  %div{class: ['my_class', 'my_another_class'], data: {view: 'my_view'}}
                     More text here.
 
                   - # Text on nested level
@@ -106,8 +106,8 @@
               - menu_items.each do |title, path, options = {}|
                 - current_page = current_page?(path)
                 - # script
-                = link_to title, path,
-                  class: "menu-item js-app-menu_item #{'is-active' if current_page}",
+                = link_to title, path, |
+                  class: "menu-item js-app-menu_item #{'is-active' if current_page}", |
                   data: {menu_item_id: options[:menu_item_id]}
 
       .layout-empty

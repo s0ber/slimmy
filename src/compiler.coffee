@@ -91,11 +91,17 @@ class Compiler
 
     isMainTag = MAIN_TAGS.indexOf(node.data.name) isnt -1
     @buffer += LINE_BREAK if isMainTag
-    @buffer += @getIndent(indLevel) + tag + ' '
-    @buffer += @compileAttrsHashes(node.data.attributes_hashes).join(' ') + LINE_BREAK
+    @buffer += @getIndent(indLevel) + tag
+    attrsHashes =  @compileAttrsHashes(node.data.attributes_hashes)
+    @buffer += ' ' + attrsHashes.join(' ') if attrsHashes.length > 0
 
-    if node.data.value
-      @buffer += @getIndent(indLevel) + INDENTATION + '| ' + node.data.value + LINE_BREAK
+    if node.data.parse
+      value = node.data.value.replace(/\s+(?=\s)/g,'').replace('( ', '(').replace(' )', ')')
+      @buffer += '=' + value + LINE_BREAK
+    else if node.data.value
+      @buffer += LINE_BREAK + @getIndent(indLevel) + INDENTATION + '| ' + node.data.value + LINE_BREAK
+    else
+      @buffer += LINE_BREAK
 
   compileComment: (node, indLevel) ->
     @buffer += @getIndent(indLevel) + '/!'
@@ -137,21 +143,28 @@ class Compiler
     if indLevel then Array(indLevel + 1).join(INDENTATION) else ''
 
   compileAttrsHashes: (hashes = []) ->
-    hashes = _.map hashes, (attributesHash) ->
+    hashes = _.map(hashes, (attributesHash) ->
       attributesHash = attributesHash.replace(/\n/g, ' ')
-      dataAttrs = attributesHash.match(/data: {(.+)}/)?[1]
-      attributesHash = attributesHash.replace(dataAttrs, '') if dataAttrs?
 
-      items =
-        for item in attributesHash.split(', ')
-          item.replace(/(\w+): /, "$1=")
+      attributes = attributesHash.replace(/'/g, '"')
+        .replace(/(\w+):/g, "\"$1\":")
 
-      attributesHash = items.join(' ')
+      attributes = JSON.parse "{#{attributes}}"
+      firstLevelKeys = _.keys(attributes)
 
-      if dataAttrs?
-        attributesHash = attributesHash.replace('data={}', "data={#{dataAttrs}}")
+      for key in firstLevelKeys
+        regExp = new RegExp("(, )*#{key}: ")
+        matcher = attributesHash.match(regExp)
+        hasComma = matcher[1]?
+
+        attributesHash =
+          if hasComma
+            attributesHash.replace(", #{key}: ", " #{key}=")
+          else
+            attributesHash.replace("#{key}: ", "#{key}=")
 
       attributesHash
+    )
 
     hashes
 
