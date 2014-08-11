@@ -15,6 +15,7 @@ class Compiler
   compile: ->
     @compileNode(@root, IND_LEVEL)
     @compileChildrenNodes(@root, IND_LEVEL)
+    @buffer += LINE_BREAK
 
   compileChildrenNodes: (node, indLevel) ->
     return unless node.children
