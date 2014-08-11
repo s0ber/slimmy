@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "q": "",
-    "underscore": ""
+    "underscore": "",
+    "walk": ""
   },
   "devDependencies": {
     "coffee-script": "~1.7.1",

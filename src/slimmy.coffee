@@ -1,14 +1,17 @@
 fs = require 'fs'
+walk = require 'walk'
+
 Parser = require './parser'
 Compiler = require './compiler'
 
+HAML_EXTENSION_REGEXP = /\.haml$/
 Slimmy = class
 
   Parser: Parser
 
   Compiler: Compiler
 
-  convert: (filePath, writeToFile = true) ->
+  convert: (filePath, writeToFile = false) ->
     filePath = @getAbsolutePath(filePath)
 
     @parser().parseFile(filePath).then (rootNode) =>
@@ -18,22 +21,36 @@ Slimmy = class
 
       @writeToSlimFile(filePath, compiler.buffer) if writeToFile
 
+  convertDir: (dirPath, writeToFile = false) ->
+    dirPath = @getAbsolutePath(dirPath)
+    files = []
+
+    walker = walk.walkSync(dirPath,
+      followLinks: false
+      listeners:
+        file: (root, stat, next) ->
+          files.push "#{root}/#{stat.name}" if HAML_EXTENSION_REGEXP.test(stat.name)
+          next()
+    )
+
+    for file in files
+      console.log "Converting file:\n#{file}"
+      @convert(file, writeToFile)
+
   writeToSlimFile: (filePath, slimCode) ->
-    console.log filePath
-    slimFilePath = filePath.replace(/\.haml$/, '.slim')
+    slimFilePath = filePath.replace(HAML_EXTENSION_REGEXP, '.slim')
 
     fd = fs.openSync(slimFilePath, 'w')
     fs.writeFileSync(slimFilePath, slimCode)
     fs.closeSync(fd)
 
-  getAbsolutePath: (filePath) ->
-    return unless filePath
-    isAbsolutePath = filePath[0] is '/' or filePath[0] is '~'
+  getAbsolutePath: (path) ->
+    isAbsolutePath = path[0] is '/' or path[0] is '~'
 
     if isAbsolutePath
-      filePath
+      path
     else
-      filePath = "#{__dirname}/../#{filePath}"
+      path = "#{__dirname}/../#{path}"
 
   parser: ->
     @_parser ?= new @Parser()

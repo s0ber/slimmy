@@ -29,6 +29,13 @@ describe 'Slimmy', ->
     sinon.spy(@slimmy, 'Compiler')
     sinon.spy(@slimmy.Compiler::, 'compile')
 
+  describe '#convertDir', ->
+    it 'converts all haml files in a dir', ->
+      filesNumber = 8
+      sinon.spy(@slimmy, 'convert')
+      @slimmy.convertDir('./spec/fixtures/folder/')
+      expect(@slimmy.convert.callCount).to.be.equal(filesNumber)
+
   describe '#convert', ->
     it 'at first parses provided file and then compiles slim from recieved ASTree', ->
       @slimmy.convert('./spec/fixtures/haml_document.haml').then =>
