@@ -67,12 +67,14 @@ describe 'Compiler', ->
         catch e
           expect(@compiler.compilePlain).to.be.calledOnce
 
-      it 'compiles base on node.data.text value', ->
+      it 'compiles based on node.data.text value', ->
         @compiler.compilePlain
           type: 'plain'
           data: {text: 'Some text'}
 
-        expect(@compiler.buffer).to.be.eql '| Some text\n'
+        expect(@compiler.buffer).to.be.eql """
+          | Some text\n
+          """
 
     context 'node is script node', ->
       it 'calls @compileScript node', ->
@@ -114,7 +116,7 @@ describe 'Compiler', ->
 
         expect(@compiler.buffer).to.be.eql '- menu_items.each do |title, path, options = {}|\n'
 
-      it 'adds empty line if silent script is a comment', ->
+      it 'prepends compiled code with empty line if silent script is a comment', ->
         @compiler.compileSilentScript
           type: 'silent_script'
           data:
@@ -132,8 +134,6 @@ describe 'Compiler', ->
           @compiler.compileNode(type: 'haml_comment')
         catch e
           expect(@compiler.compileHamlComment).to.be.calledOnce
-
-      it 'compiles proper slim string for comment', ->
 
     context 'node is tag node', ->
       it 'calls @compileTag node', ->
@@ -155,6 +155,36 @@ describe 'Compiler', ->
 
         expect(@compiler.buffer).to.be.equal """
           span class='my_class' data={attr: 'value', another_attr: 'another_value'}\n
+          """
+
+      it 'compiles div tag if no classes or no id for this div provided', ->
+        @compiler.compileTag
+          "type": "tag",
+          "data":
+            "name": "div"
+            "attributes": {}
+            "attributes_hashes": [
+              "class: 'my_class', data: {attr: 'value', another_attr: 'another_value'}"
+            ]
+            "value": "Some text here."
+
+        @compiler.compileTag
+          "type": "tag",
+          "data":
+            "name": "div"
+            "attributes": {
+              "class": "some_class"
+            }
+            "attributes_hashes": [
+              "class: 'other_class'"
+            ]
+            "value": "Some text here."
+
+        expect(@compiler.buffer).to.be.equal """
+          div class='my_class' data={attr: 'value', another_attr: 'another_value'}
+            | Some text here.
+          .some_class class='other_class'
+            | Some text here.\n
           """
 
       it 'compiles proper slim string for tag with id or classes', ->
@@ -209,6 +239,18 @@ describe 'Compiler', ->
           body#unique.page.js-app-page_wrapper class='my_class' data={attr: 'value', another_attr: 'another_value'}
             | Some text here.\n
           """
+      it 'works with parsed data', ->
+        @compiler.compileTag
+          "type": "tag",
+          "data":
+            "name": "span",
+            "parse": true,
+            "value": "link_to item_path, class: 'menu-item_link'"
+
+        expect(@compiler.buffer).to.be.equal """
+          span =link_to item_path, class: 'menu-item_link'\n
+          """
+
       it 'works with multiline text strings', ->
         @compiler.compileTag
           "type": "tag",
@@ -218,7 +260,7 @@ describe 'Compiler', ->
             "value": "h(                         \"I think this might get \" +  \"pretty long so I should \" + \"probably make it \" +        \"multiline so it doesn't \" + \"look awful.\" )"
 
         expect(@compiler.buffer).to.be.equal """
-          p=h("I think this might get " + \
+          p =h("I think this might get " + \
           "pretty long so I should " + \
           "probably make it " + \
           "multiline so it doesn't " + \

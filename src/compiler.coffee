@@ -97,7 +97,7 @@ class Compiler
 
     if node.data.parse
       value = node.data.value.replace(/\s+(?=\s)/g,'').replace('( ', '(').replace(' )', ')')
-      @buffer += '=' + value + LINE_BREAK
+      @buffer += ' =' + value + LINE_BREAK
     else if node.data.value
       @buffer += LINE_BREAK + @getIndent(indLevel) + INDENTATION + '| ' + node.data.value + LINE_BREAK
     else

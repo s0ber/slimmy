@@ -110,6 +110,8 @@
                   class: "menu-item js-app-menu_item #{'is-active' if current_page}", |
                   data: {menu_item_id: options[:menu_item_id]}
 
+                %span= link_to title, path, class: "menu-item"
+
       .layout-empty
 
     %footer.layout-footer
