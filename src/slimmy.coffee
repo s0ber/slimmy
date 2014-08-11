@@ -1,3 +1,5 @@
+Q = require 'q'
+_ = require 'underscore'
 fs = require 'fs'
 walk = require 'walk'
 
@@ -33,9 +35,10 @@ Slimmy = class
           next()
     )
 
-    for file in files
+    Q.all(_.map(files, (file) =>
       console.log "Converting file:\n#{file}"
       @convert(file, writeToFile)
+    ))
 
   writeToSlimFile: (filePath, slimCode) ->
     slimFilePath = filePath.replace(HAML_EXTENSION_REGEXP, '.slim')

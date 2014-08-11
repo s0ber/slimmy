@@ -31,10 +31,13 @@ describe 'Slimmy', ->
 
   describe '#convertDir', ->
     it 'converts all haml files in a dir', ->
+      @timeout(10000)
       filesNumber = 8
-      sinon.spy(@slimmy, 'convert')
-      @slimmy.convertDir('./spec/fixtures/folder/')
-      expect(@slimmy.convert.callCount).to.be.equal(filesNumber)
+      slimmy = new Slimmy()
+
+      sinon.spy(slimmy, 'convert')
+      slimmy.convertDir('./spec/fixtures/folder', true).then ->
+        expect(slimmy.convert.callCount).to.be.equal(filesNumber)
 
   describe '#convert', ->
     it 'at first parses provided file and then compiles slim from recieved ASTree', ->
