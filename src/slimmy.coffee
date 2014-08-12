@@ -14,7 +14,13 @@ Slimmy = class
 
   Compiler: Compiler
 
-  convert: (filePath, writeToFile = false) ->
+  convertString: (hamlCodeString) ->
+    @parser().parseString(hamlCodeString).then (rootNode) =>
+      compiler = new @Compiler(rootNode, false)
+      compiler.compile()
+      compiler.buffer
+
+  convertFile: (filePath, writeToFile = false) ->
     filePath = @getAbsolutePath(filePath)
 
     @parser().parseFile(filePath).then (rootNode) =>
@@ -40,7 +46,7 @@ Slimmy = class
     Q
       .allSettled(_.map(files, (file) =>
         console.log(file)
-        @convert(file, writeToFile)
+        @convertFile(file, writeToFile)
       ))
       .catch((e) ->
         console.log e

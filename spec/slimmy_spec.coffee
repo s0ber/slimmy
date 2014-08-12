@@ -35,13 +35,13 @@ describe 'Slimmy', ->
       filesNumber = 8
       slimmy = new Slimmy()
 
-      sinon.spy(slimmy, 'convert')
+      sinon.spy(slimmy, 'convertFile')
       slimmy.convertDir('./spec/fixtures/folder').then ->
-        expect(slimmy.convert.callCount).to.be.equal(filesNumber)
+        expect(slimmy.convertFile.callCount).to.be.equal(filesNumber)
 
-  describe '#convert', ->
+  describe '#convertFile', ->
     it 'at first parses provided file and then compiles slim from recieved ASTree', ->
-      @slimmy.convert('./spec/fixtures/haml_document.haml').then =>
+      @slimmy.convertFile('./spec/fixtures/haml_document.haml').then =>
         expect(@slimmy.Parser::parseFile).to.be.calledOnce
         expect(@slimmy.Compiler.lastCall.args).to.be.eql [@rootNode]
         expect(@slimmy.Compiler::compile).to.be.calledOnce
@@ -50,7 +50,23 @@ describe 'Slimmy', ->
     # not actual test case, just printing compiled (to slim) haml document to console
     it 'logs compiled fixture to concole', ->
       slimmy = new Slimmy()
-      slimmy.convert('./spec/fixtures/haml_document.haml').then ->
+      slimmy.convertFile('./spec/fixtures/haml_document.haml').then ->
         # console.log('\n')
         # console.log(slimmy._compilationResults)
 
+  describe '#convertString', ->
+    it 'converts provided haml string to a slim code string', ->
+      slimmy = new Slimmy()
+
+      slimmy.convertString("""
+        %html
+          %head
+          %body
+
+      """).then (slimCode) ->
+        expect(slimCode).to.be.equal """
+          html
+            head
+            body
+\n
+        """

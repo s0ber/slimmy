@@ -8,7 +8,11 @@ class Parser
   AstNode: AstNode
 
   parseFile: (filePath) ->
-    @_execHamlParsing(filePath).then (data) =>
+    @_execHamlFileParsing(filePath).then (data) =>
+      @buildASTree(data)
+
+  parseString: (hamlString) ->
+    @_execHamlStringParsing(hamlString).then (data) =>
       @buildASTree(data)
 
   buildASTree: (data) ->
@@ -32,11 +36,11 @@ class Parser
     new @AstNode(data)
 
   # this method executes async ruby command, you should mock it in tests
-  _execHamlParsing: (filePath) ->
+  _execHamlFileParsing: (filePath) ->
     dfd = Q.defer()
     exec = require('child_process').exec
 
-    child = exec(@_hamlParseCmd(filePath), (error, output) =>
+    child = exec(@_hamlParseFileCmd(filePath), (error, output) =>
       dfd.resolve(JSON.parse(output))
     ).on('exit', (code) ->
       child.kill()
@@ -46,8 +50,27 @@ class Parser
 
     dfd.promise
 
-  _hamlParseCmd: (filePath) ->
-    converterPath = "#{__dirname}/../bin/haml_json_converter.rb"
+  _hamlParseFileCmd: (filePath) ->
+    converterPath = "#{__dirname}/../bin/haml_file_json_converter.rb"
     "ruby #{converterPath} #{filePath}"
+
+  # this method executes async ruby command, you should mock it in tests
+  _execHamlStringParsing: (hamlString) ->
+    dfd = Q.defer()
+    exec = require('child_process').exec
+
+    child = exec(@_hamlParseStringCmd(hamlString), (error, output) =>
+      dfd.resolve(JSON.parse(output))
+    ).on('exit', (code) ->
+      child.kill()
+      unless code is 0
+        console.log "Child process exited with exit code #{code}"
+    )
+
+    dfd.promise
+
+  _hamlParseStringCmd: (hamlString) ->
+    converterPath = "#{__dirname}/../bin/haml_string_json_converter.rb"
+    "ruby #{converterPath} \"#{hamlString}\""
 
 module.exports = Parser

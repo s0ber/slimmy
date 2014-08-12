@@ -18,7 +18,7 @@ describe 'Parser', ->
         {type: 'tag', data: {b: 3}, children: []}
       ]
 
-    @parser._execHamlParsing = (filePath) =>
+    @parser._execHamlFileParsing = (filePath) =>
       dfd = Q.defer()
       dfd.resolve(@rootNodeJson)
       dfd.promise
@@ -62,8 +62,19 @@ describe 'Parser', ->
       for childNode in rootNode.children
         expect(childNode.parent).to.be.equal rootNode
 
-  describe '#_execHamlParsing', ->
+  describe '#_execHamlFileParsing', ->
     it 'parses file with ruby haml gem parser', ->
       parser = new Parser()
-      parser._execHamlParsing('./spec/fixtures/haml_document.haml').then (result) =>
+      parser._execHamlFileParsing('./spec/fixtures/haml_document.haml').then (result) =>
         # console.log result
+
+  describe '#_execHamlStringParsing', ->
+    it 'parses string of haml code', ->
+      parser = new Parser()
+      parser._execHamlStringParsing("""
+        %html
+          %head
+          %body
+
+      """).then (results) ->
+        # console.log results

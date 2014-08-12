@@ -8,7 +8,7 @@ MID_BLOCK_KEYWORDS = 'else elsif rescue ensure end when'.split(' ')
 
 class Compiler
 
-  constructor: (rootNode) ->
+  constructor: (rootNode, @customFormatting = true) ->
     @root = rootNode
     @buffer = ''
 
@@ -99,7 +99,8 @@ class Compiler
       else if key is 'id'
         tag += '#' + value
 
-    isMainTag = MAIN_TAGS.indexOf(node.data.name) isnt -1
+    isMainTag = @customFormatting and MAIN_TAGS.indexOf(node.data.name) isnt -1
+
     @buffer += LINE_BREAK if isMainTag
     @buffer += @getIndent(indLevel) + tag
     attrsHashes =  @compileAttrsHashes(node.data.attributes_hashes)
