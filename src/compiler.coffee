@@ -24,6 +24,8 @@ class Compiler
       @compileChildrenNodes(child, indLevel + 1)
 
   compileNode: (node, indLevel) ->
+    @addEmptyLine() if @_shouldPrependWithEmptyLine(node)
+
     compilationMethod = switch node.type
       when 'root'
         'compileRoot'
@@ -110,9 +112,6 @@ class Compiler
       else if key is 'id'
         tag += '#' + value
 
-    isMainTag = @fileCompilationMode and MAIN_TAGS.indexOf(node.data.name) isnt -1
-
-    @buffer += LINE_BREAK if isMainTag
     @buffer += @getIndent(indLevel) + tag
     attrsHashes =  @compileAttrsHashes(node.data.attributes_hashes)
     @buffer += ' ' + attrsHashes.join(' ') if attrsHashes.length > 0
@@ -189,5 +188,12 @@ class Compiler
     )
 
     hashes
+
+  addEmptyLine: ->
+    @buffer += LINE_BREAK
+
+  _shouldPrependWithEmptyLine: (node) ->
+    return unless @fileCompilationMode
+    node.type is 'tag' and node.data? and MAIN_TAGS.indexOf(node.data.name) isnt -1
 
 module.exports = Compiler

@@ -177,7 +177,7 @@ describe 'Compiler', ->
           expect(@compiler.compileTag).to.be.calledOnce
 
       it 'compiles proper slim string for tag without id or classes', ->
-        @compiler.compileTag
+        @compiler.compileNode
           "type": "tag",
           "data":
             "name": "span"
@@ -255,7 +255,7 @@ describe 'Compiler', ->
           """
 
       it 'prepends string with line break, if it is main tag', ->
-        @compiler.compileTag
+        @compiler.compileNode
           "type": "tag",
           "data":
             "name": "body"
@@ -272,6 +272,7 @@ describe 'Compiler', ->
           body#unique.page.js-app-page_wrapper class='my_class' data={attr: 'value', another_attr: 'another_value'}
             | Some text here.\n
           """
+
       it 'works with parsed data', ->
         @compiler.compileTag
           "type": "tag",

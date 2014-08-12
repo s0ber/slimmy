@@ -14,9 +14,9 @@ Slimmy = class
 
   Compiler: Compiler
 
-  convertString: (hamlCodeString) ->
+  convertString: (hamlCodeString, fileCompilationMode = false) ->
     @parser().parseString(hamlCodeString).then (rootNode) =>
-      compiler = new @Compiler(rootNode, false)
+      compiler = new @Compiler(rootNode, fileCompilationMode)
       compiler.compile()
       compiler.buffer
 
