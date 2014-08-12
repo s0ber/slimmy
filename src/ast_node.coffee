@@ -1,4 +1,5 @@
 _ = require 'underscore'
+INLINE_TAGS = 'b big i small tt abbr acronym cite code dfn em kbd strong samp var a bdo map object q script span sub sup'.split(' ')
 
 class AstNode
 
@@ -14,7 +15,13 @@ class AstNode
     @parent = node
 
   isInline: ->
-    @type is 'plain'
+    switch
+      when @type is 'plain'
+        true
+      when @type is 'tag' and INLINE_TAGS.indexOf(@data.name) isnt -1
+        true
+      else
+        false
 
   nextNode: ->
     if not @parent? or not _.isArray(@parent.children)
