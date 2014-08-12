@@ -7,6 +7,7 @@ Parser = require './parser'
 Compiler = require './compiler'
 
 HAML_EXTENSION_REGEXP = /\.haml$/
+
 Slimmy = class
 
   Parser: Parser

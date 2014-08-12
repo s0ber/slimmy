@@ -21,8 +21,12 @@ class Parser
     node.children ?= []
     for childData in childrenData
       childNode = @convertDataToAstNode(childData)
+      @setParentForAstNode(childNode, node)
       node.children.push(childNode)
       @setChildrenForAstNode(childNode, childData.children)
+
+  setParentForAstNode: (node, parentNode) ->
+    node.setParent(parentNode)
 
   convertDataToAstNode: (data) ->
     new @AstNode(data)
@@ -44,11 +48,6 @@ class Parser
 
   _hamlParseCmd: (filePath) ->
     converterPath = "#{__dirname}/../bin/haml_json_converter.rb"
-
-    isAbsolutePath = filePath[0] is '/' or filePath[0] is '~'
-    unless isAbsolutePath
-      filePath = "#{__dirname}/../#{filePath}"
-
     "ruby #{converterPath} #{filePath}"
 
 module.exports = Parser

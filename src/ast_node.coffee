@@ -3,6 +3,14 @@ _ = require 'underscore'
 class AstNode
 
   constructor: (json) ->
-    _.extend(@, type: json.type, data: _.clone(json.data))
+    data = _.clone(json.data)
+    delete data?.children
+
+    _.extend(@, {type: json.type, data})
+
+    @parent = null
+
+  setParent: (node) ->
+    @parent = node
 
 module.exports = AstNode

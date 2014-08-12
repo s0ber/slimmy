@@ -24,3 +24,10 @@ describe 'AstNode', ->
     it 'sets data without children references in AstNode object', ->
       expect(@node.children).to.be.undefined
 
+  describe '#setParent', ->
+    it 'sets provided node as parent for the current node', ->
+      @childNode = new AstNode(type: 'tag', data: {a: 2}, children: [])
+      @childNode.setParent(@node)
+
+      expect(@childNode.parent).to.be.equal @node
+

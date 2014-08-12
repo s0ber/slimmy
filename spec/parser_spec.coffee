@@ -6,6 +6,7 @@ describe 'Parser', ->
   beforeEach ->
     @parser = new Parser()
     @parser.AstNode = sinon.spy()
+    @parser.setParentForAstNode = ->
 
     @rootNodeJson =
       type: 'root',
@@ -46,6 +47,20 @@ describe 'Parser', ->
     it 'provides data to AstNode constructor', ->
       node = @parser.convertDataToAstNode(@rootNodeJson)
       expect(@parser.AstNode.lastCall.args).to.be.eql [@rootNodeJson]
+
+  describe '#setChildrenForAstNode', ->
+    it 'sets children for node', ->
+      rootNode = @parser.convertDataToAstNode(@rootNodeJson)
+      @parser.setChildrenForAstNode(rootNode, @rootNodeJson.children)
+      expect(rootNode.children).to.have.length 3
+
+    it 'makes children have @parent pointing to parent node', ->
+      parser = new Parser()
+      rootNode = parser.convertDataToAstNode(@rootNodeJson)
+      parser.setChildrenForAstNode(rootNode, @rootNodeJson.children)
+
+      for childNode in rootNode.children
+        expect(childNode.parent).to.be.equal rootNode
 
   describe '#_execHamlParsing', ->
     it 'parses file with ruby haml gem parser', ->

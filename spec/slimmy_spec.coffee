@@ -51,6 +51,6 @@ describe 'Slimmy', ->
     it 'logs compiled fixture to concole', ->
       slimmy = new Slimmy()
       slimmy.convert('./spec/fixtures/haml_document.haml').then ->
-        console.log('\n')
-        console.log(slimmy._compilationResults)
+        # console.log('\n')
+        # console.log(slimmy._compilationResults)
 
