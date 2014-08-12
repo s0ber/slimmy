@@ -30,7 +30,7 @@ describe 'Slimmy', ->
     sinon.spy(@slimmy.Compiler::, 'compile')
 
   describe '#convertDir', ->
-    xit 'converts all haml files in a dir', ->
+    it 'converts all haml files in a dir', ->
       @timeout(10000)
       filesNumber = 8
       slimmy = new Slimmy()

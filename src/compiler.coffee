@@ -100,6 +100,9 @@ class Compiler
           ''
     else
       tag = "#{node.data.name}"
+      nextNode = node.nextNode?()
+      if nextNode?.isInline()
+        tag += '>'
 
     for key, value of node.data.attributes
       if key is 'class'

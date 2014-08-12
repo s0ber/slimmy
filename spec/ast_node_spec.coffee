@@ -52,9 +52,18 @@ describe 'AstNode', ->
       expect(rootNode.children[0].prevNode()).to.be.null
 
   describe '#isInline', ->
-    context 'node is plain text node', ->
+    context 'node is plain text', ->
       it 'returns true', ->
         node = new AstNode
           type: 'plain'
           data: {text: 'Some text here.'}
+
+        expect(node.isInline()).to.be.true
+
+    context 'node is inline tag', ->
+      it 'returns true', ->
+        node = new AstNode
+          type: 'tag'
+          data: {name: 'span', value: 'Inline text'}
+
         expect(node.isInline()).to.be.true
