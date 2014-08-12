@@ -13,4 +13,30 @@ class AstNode
   setParent: (node) ->
     @parent = node
 
+  nextNode: ->
+    if not @parent? or not _.isArray(@parent.children)
+      nextNode = null
+    else
+      index = @parent.children.indexOf(@)
+      nextNode =
+        if index is -1 or not @parent.children[index + 1]?
+          null
+        else
+          @parent.children[index + 1]
+
+    nextNode
+
+  prevNode: ->
+    if not @parent? or not _.isArray(@parent.children)
+      prevNode = null
+    else
+      index = @parent.children.indexOf(@)
+      prevNode =
+        if index is -1 or not @parent.children[index - 1]?
+          null
+        else
+          @parent.children[index - 1]
+
+    prevNode
+
 module.exports = AstNode

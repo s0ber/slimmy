@@ -8,9 +8,9 @@ describe 'AstNode', ->
       data:
         {a: 1, b: 2, c: 3}
       children: [
+        {type: 'tag', data: {a: 1}, children: []}
         {type: 'tag', data: {a: 2}, children: []}
         {type: 'tag', data: {a: 3}, children: []}
-        {type: 'tag', data: {b: 3}, children: []}
       ]
 
     @node = new AstNode(@rootNodeJson)
@@ -31,3 +31,22 @@ describe 'AstNode', ->
 
       expect(@childNode.parent).to.be.equal @node
 
+  describe '#nextNode', ->
+    it 'returns next child node of parent node', ->
+      Parser = require '../src/parser'
+      parser = new Parser()
+      rootNode = parser.buildASTree(@rootNodeJson)
+
+      expect(rootNode.children[0].nextNode().data).to.be.eql {a: 2}
+      expect(rootNode.children[1].nextNode().data).to.be.eql {a: 3}
+      expect(rootNode.children[2].nextNode()).to.be.null
+
+  describe '#prevNode', ->
+    it 'returns prev child node of parent node', ->
+      Parser = require '../src/parser'
+      parser = new Parser()
+      rootNode = parser.buildASTree(@rootNodeJson)
+
+      expect(rootNode.children[2].prevNode().data).to.be.eql {a: 2}
+      expect(rootNode.children[1].prevNode().data).to.be.eql {a: 1}
+      expect(rootNode.children[0].prevNode()).to.be.null
