@@ -3,6 +3,7 @@ watch = require('gulp-watch')
 mocha = require('gulp-mocha')
 gutil = require('gulp-util')
 coffee = require('gulp-coffee')
+rimraf = require('rimraf')
 
 sourceFiles = [
   'src/slimmy.coffee'
@@ -14,10 +15,13 @@ specFiles = sourceFiles.concat [
   'spec/**/*.coffee'
 ]
 
-gulp.task 'release', ['mocha:ci'], ->
-  gulp.src(sourceFiles)
-    .pipe(coffee(bare: false).on('error', gutil.log))
-    .pipe(gulp.dest('lib/'))
+gulp.task 'release', ['mocha:ci'], (done) ->
+  rimraf 'lib/', ->
+    gulp.src(sourceFiles)
+      .pipe(coffee(bare: false).on('error', gutil.log))
+      .pipe(gulp.dest('lib/'))
+
+    done()
 
 gulp.task 'mocha:ci', ->
   gulp.src(specFiles, read: false)

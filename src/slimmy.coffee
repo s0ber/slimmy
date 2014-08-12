@@ -36,10 +36,17 @@ Slimmy = class
     )
 
     console.log "Converting files:"
-    Q.all(_.map(files, (file) =>
-      console.log(file)
-      @convert(file, writeToFile)
-    ))
+    Q
+      .allSettled(_.map(files, (file) =>
+        console.log(file)
+        @convert(file, writeToFile)
+      ))
+      .catch((e) ->
+        console.log e
+      )
+      .then(->
+        console.log 'All files are converted.'
+      )
 
   writeToSlimFile: (filePath, slimCode) ->
     slimFilePath = filePath.replace(HAML_EXTENSION_REGEXP, '.slim')
