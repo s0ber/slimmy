@@ -8,14 +8,14 @@ MID_BLOCK_KEYWORDS = 'else elsif rescue ensure end when'.split(' ')
 
 class Compiler
 
-  constructor: (rootNode, @customFormatting = true) ->
+  constructor: (rootNode, @fileCompilationMode = true) ->
     @root = rootNode
     @buffer = ''
 
   compile: ->
     @compileNode(@root, IND_LEVEL)
     @compileChildrenNodes(@root, IND_LEVEL)
-    @buffer += LINE_BREAK
+    @buffer += LINE_BREAK if @fileCompilationMode
 
   compileChildrenNodes: (node, indLevel) ->
     return unless node.children
@@ -54,7 +54,15 @@ class Compiler
 
   compilePlain: (node, indLevel) ->
     firstChar = node.data.text[0]
-    @buffer += @getIndent(indLevel) + '| ' + node.data.text + LINE_BREAK
+
+    nextNode = node.nextNode?()
+    plainTextPrefix =
+      if nextNode?.isInline()
+        "' "
+      else
+        '| '
+
+    @buffer += @getIndent(indLevel) + plainTextPrefix + node.data.text + LINE_BREAK
 
   compileScript: (node, indLevel) ->
     scriptLen = node.data.text.length
@@ -99,7 +107,7 @@ class Compiler
       else if key is 'id'
         tag += '#' + value
 
-    isMainTag = @customFormatting and MAIN_TAGS.indexOf(node.data.name) isnt -1
+    isMainTag = @fileCompilationMode and MAIN_TAGS.indexOf(node.data.name) isnt -1
 
     @buffer += LINE_BREAK if isMainTag
     @buffer += @getIndent(indLevel) + tag

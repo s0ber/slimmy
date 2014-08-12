@@ -50,3 +50,11 @@ describe 'AstNode', ->
       expect(rootNode.children[2].prevNode().data).to.be.eql {a: 2}
       expect(rootNode.children[1].prevNode().data).to.be.eql {a: 1}
       expect(rootNode.children[0].prevNode()).to.be.null
+
+  describe '#isInline', ->
+    context 'node is plain text node', ->
+      it 'returns true', ->
+        node = new AstNode
+          type: 'plain'
+          data: {text: 'Some text here.'}
+        expect(node.isInline()).to.be.true

@@ -13,6 +13,9 @@ class AstNode
   setParent: (node) ->
     @parent = node
 
+  isInline: ->
+    @type is 'plain'
+
   nextNode: ->
     if not @parent? or not _.isArray(@parent.children)
       nextNode = null
