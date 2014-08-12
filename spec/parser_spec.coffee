@@ -26,10 +26,22 @@ describe 'Parser', ->
   describe '#parseFile', ->
     it 'returns AstNode, which is root node of AST for given file', ->
       @parser.parseFile('./spec/fixtures/haml_document.haml').then (rootNode) =>
-        expect(@parser.AstNode).to.be.called.once
+        expect(@parser.AstNode).to.be.called
         expect(@parser.AstNode.firstCall.args).to.be.eql [@rootNodeJson]
 
         expect(rootNode).to.be.instanceOf(@parser.AstNode)
+
+  describe '#parseString', ->
+    it 'returns AstNode, which is root node of AST for given haml code string', ->
+      parser = new Parser()
+      parser.parseString("""
+        %html
+          %head
+          %body
+      """)
+      .then (rootNode) =>
+        expect(rootNode).to.be.instanceOf(parser.AstNode)
+        expect(rootNode.children[0].data.name).to.be.equal 'html'
 
   describe '#buildASTree', ->
     it 'creates tree of AstNode objects', ->

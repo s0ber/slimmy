@@ -5,7 +5,7 @@ describe 'Slimmy', ->
   beforeEach ->
     @slimmy = new Slimmy()
 
-  describe 'Inline tags sequences', ->
+  describe 'Inline elements sequences', ->
     it 'makes plain text node has trailing space if next node is plain text', ->
       @slimmy.convertString("""
           Plain text string
