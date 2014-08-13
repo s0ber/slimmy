@@ -67,3 +67,20 @@ describe 'AstNode', ->
           data: {name: 'span', value: 'Inline text'}
 
         expect(node.isInline()).to.be.true
+
+  describe '#isSilentScript', ->
+    it 'returns true if node is silent script', ->
+      node = new AstNode
+        type: 'silent_script'
+        data: {keyword: 'if'}
+
+      expect(node.isSilentScript()).to.be.true
+
+  describe '#isScript', ->
+    it 'returns true if node is script', ->
+      node = new AstNode
+        type: 'script'
+        data: {text: ' link_to'}
+
+      expect(node.isScript()).to.be.true
+

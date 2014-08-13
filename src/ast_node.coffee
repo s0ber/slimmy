@@ -1,5 +1,6 @@
 _ = require 'underscore'
 INLINE_TAGS = 'b big i small tt abbr acronym cite code dfn em kbd strong samp var a bdo map object q script span sub sup'.split(' ')
+MID_BLOCK_KEYWORDS = 'else elsif rescue ensure end when'.split(' ')
 
 class AstNode
 
@@ -22,6 +23,15 @@ class AstNode
         true
       else
         false
+
+  isSilentScript: ->
+    @type is 'silent_script' and MID_BLOCK_KEYWORDS.indexOf(@data.keyword) is -1
+
+  isScript: ->
+    @type is 'script'
+
+  isPlain: ->
+    @type is 'plain'
 
   nextNode: ->
     if not @parent? or not _.isArray(@parent.children)

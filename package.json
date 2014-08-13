@@ -13,7 +13,8 @@
   "dependencies": {
     "q": "",
     "underscore": "",
-    "walk": ""
+    "walk": "",
+    "riline": "~0.1.1"
   },
   "devDependencies": {
     "coffee-script": "~1.7.1",

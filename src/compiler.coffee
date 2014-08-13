@@ -1,4 +1,5 @@
 _ = require 'underscore'
+Riline = require 'riline'
 
 INDENTATION = "  "
 IND_LEVEL = 0
@@ -11,11 +12,14 @@ class Compiler
   constructor: (rootNode, @fileCompilationMode = true) ->
     @root = rootNode
     @buffer = ''
+    @warnings = []
 
   compile: ->
     @compileNode(@root, IND_LEVEL)
     @compileChildrenNodes(@root, IND_LEVEL)
     @buffer += LINE_BREAK if @fileCompilationMode
+
+    @_showWarnings()
 
   compileChildrenNodes: (node, indLevel) ->
     return unless node.children
@@ -66,6 +70,15 @@ class Compiler
 
     @buffer += @getIndent(indLevel) + plainTextPrefix + node.data.text + LINE_BREAK
 
+    if nextNode?.isSilentScript()
+      @warnings.push
+        text: 'Plain text is followed by a silent script, which execution result can be an inline element'
+        startLine: @currentLine()
+    else if nextNode?.isScript()
+      @warnings.push
+        text: 'Plain text is followed by a script, which execution result can be an inline element'
+        startLine: @currentLine()
+
   compileScript: (node, indLevel) ->
     scriptLen = node.data.text.length
     isInterpolatedString = node.data.text[0] is '"' and node.data.text[scriptLen - 1] is '"'
@@ -74,6 +87,18 @@ class Compiler
       @buffer += @getIndent(indLevel) + node.data.text.substr(1, scriptLen - 2) + LINE_BREAK
     else
       @buffer += @getIndent(indLevel) + '=' + node.data.text + LINE_BREAK
+
+    nextNode = node.nextNode?()
+
+    if nextNode?
+      if nextNode.isPlain()
+        @warnings.push
+          text: 'Script, which execution can be an inline element, is followed by a plain text',
+          startLine: @currentLine()
+      else if nextNode.isInline()
+        @warnings.push
+          text: 'Script, which execution can be an inline element, is followed by an inline tag',
+          startLine: @currentLine()
 
   compileSilentScript: (node, indLevel) ->
     if /# EMPTY_LINE/.test(node.data.text)
@@ -91,6 +116,17 @@ class Compiler
 
       @buffer += indent + '-' + node.data.text + LINE_BREAK
 
+    nextNode = node.nextNode?()
+    if node.isSilentScript?() and nextNode?
+      if nextNode.isPlain()
+        @warnings.push
+          text: 'Silent script, which execution can be an inline element, is followed by a plain text',
+          startLine: @currentLine()
+      else if nextNode.isInline()
+        @warnings.push
+          text: 'Silent script, which execution can be an inline element, is followed by an inline tag',
+          startLine: @currentLine()
+
   compileHamlComment: (node, indLevel) ->
 
   compileTag: (node, indLevel) ->
@@ -103,7 +139,7 @@ class Compiler
     else
       tag = "#{node.data.name}"
       nextNode = node.nextNode?()
-      if nextNode?.isInline()
+      if node.isInline?() and nextNode?.isInline()
         tag += '>'
 
     for key, value of node.data.attributes
@@ -123,6 +159,19 @@ class Compiler
       @buffer += LINE_BREAK + @getIndent(indLevel) + INDENTATION + '| ' + node.data.value + LINE_BREAK
     else
       @buffer += LINE_BREAK
+
+    endLine = @currentLine()
+
+    if node.isInline?()
+      if nextNode?.isSilentScript()
+        @warnings.push
+          text: 'Inline tag is followed by a silent script, which execution result can be an inline element',
+          startLine: @currentLine()
+
+      else if nextNode?.isScript()
+        @warnings.push
+          text: 'Inline tag is followed by a script, which execution result can be an inline element',
+          startLine: @currentLine()
 
   compileComment: (node, indLevel) ->
     @buffer += @getIndent(indLevel) + '/!'
@@ -163,6 +212,9 @@ class Compiler
   getIndent: (indLevel) ->
     if indLevel then Array(indLevel + 1).join(INDENTATION) else ''
 
+  currentLine: ->
+    @buffer.split(LINE_BREAK).length - 1
+
   compileAttrsHashes: (hashes = []) ->
     hashes = _.map(hashes, (attributesHash) ->
       attributesHash = attributesHash.replace(/\n/g, ' ')
@@ -195,5 +247,16 @@ class Compiler
   _shouldPrependWithEmptyLine: (node) ->
     return unless @fileCompilationMode
     node.type is 'tag' and node.data? and MAIN_TAGS.indexOf(node.data.name) isnt -1
+
+  _showWarnings: ->
+    riline = new Riline(@buffer)
+
+    for warning in @warnings
+      riline.addMessage
+        text: warning.text
+        startLine: warning.startLine
+        endLine: warning.endLine
+
+    riline.printMessages()
 
 module.exports = Compiler

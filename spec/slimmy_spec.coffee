@@ -48,7 +48,7 @@ describe 'Slimmy', ->
         expect(@slimmy.Compiler::compile).to.be.calledAfter @slimmy.Parser::parseFile
 
     # not actual test case, just printing compiled (to slim) haml document to console
-    it 'logs compiled fixture to concole', ->
+    it 'logs compiled fixture to console', ->
       slimmy = new Slimmy()
       slimmy.convertFile('./spec/fixtures/haml_document.haml').then ->
         # console.log('\n')
@@ -62,8 +62,8 @@ describe 'Slimmy', ->
         %html
           %head
           %body
-      """).then (slimCode) ->
-        expect(slimCode).to.be.equal """
+      """).then (compiler) ->
+        expect(compiler.buffer).to.be.equal """
           html
             head
             body\n

@@ -18,7 +18,7 @@ Slimmy = class
     @parser().parseString(hamlCodeString).then (rootNode) =>
       compiler = new @Compiler(rootNode, fileCompilationMode)
       compiler.compile()
-      compiler.buffer
+      compiler
 
   convertFile: (filePath, writeToFile = false) ->
     filePath = @getAbsolutePath(filePath)

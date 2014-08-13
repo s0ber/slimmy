@@ -11,8 +11,8 @@ describe 'Slimmy', ->
           Plain text string
           and another string.
         """)
-      .then (code) ->
-        expect(code).to.be.equal """
+      .then (compiler) ->
+        expect(compiler.buffer).to.be.equal """
           ' Plain text string
           | and another string.\n
         """
@@ -22,8 +22,8 @@ describe 'Slimmy', ->
           and another string
           and one more string.
         """)
-      .then (code) ->
-        expect(code).to.be.equal """
+      .then (compiler) ->
+        expect(compiler.buffer).to.be.equal """
           ' Plain text string
           ' and another string
           | and one more string.\n
@@ -37,8 +37,8 @@ describe 'Slimmy', ->
             %strong and one more inner string.
 
         """)
-      .then (code) ->
-        expect(code).to.be.equal """
+      .then (compiler) ->
+        expect(compiler.buffer).to.be.equal """
           ' Plain text string
           span
             ' and another string
@@ -55,8 +55,8 @@ describe 'Slimmy', ->
             and more,
           and even more.
         """)
-      .then (code) ->
-        expect(code).to.be.equal """
+      .then (compiler) ->
+        expect(compiler.buffer).to.be.equal """
           ' Plain text string
           span>
             ' and another string
@@ -76,8 +76,8 @@ describe 'Slimmy', ->
           %em and even more,
           and more.
         """)
-      .then (code) ->
-        expect(code).to.be.equal """
+      .then (compiler) ->
+        expect(compiler.buffer).to.be.equal """
           ' Plain text string
           span>
             ' and another string
@@ -89,4 +89,121 @@ describe 'Slimmy', ->
             | and even more,
           | and more.\n
         """
+
+  describe 'Warnings', ->
+    context 'plain text followed by silent script', ->
+      it 'throws a warning', ->
+        @slimmy.convertString("""
+            Plain text string
+            - if true
+              %span Some text.
+            - else
+              %span Another text.
+          """)
+        .then (compiler) ->
+          expect(compiler.warnings).to.include
+            text: 'Plain text is followed by a silent script, which execution result can be an inline element',
+            startLine: 1
+
+    context 'plain text followed by script', ->
+      it 'throws a warning', ->
+        @slimmy.convertString("""
+            Text here.
+            %div
+              Some text in div.
+            Plain text string
+            = link_to ...
+            Another text.
+            And more text.
+          """)
+        .then (compiler) ->
+          expect(compiler.warnings).to.include
+            text: 'Plain text is followed by a script, which execution result can be an inline element',
+            startLine: 4
+
+    context 'inline tag followed by silent script', ->
+      it 'throws a warning', ->
+        @slimmy.convertString("""
+            Text here.
+            %span
+              Some text in div.
+            - if true
+              True
+            - else
+              False
+            Another text.
+            And more text.
+          """)
+        .then (compiler) ->
+          expect(compiler.warnings).to.be.include
+            text: 'Inline tag is followed by a silent script, which execution result can be an inline element',
+            startLine: 2
+
+    context 'inline tag followed by script', ->
+      it 'throws a warning', ->
+        @slimmy.convertString("""
+            Text here.
+            And more text.
+            %span
+              Some text in div.
+            = link_to ...
+            Another text.
+          """)
+        .then (compiler) ->
+          expect(compiler.warnings).to.include
+            text: 'Inline tag is followed by a script, which execution result can be an inline element',
+            startLine: 3
+
+    context 'silent script followed by a plain text', ->
+      it 'throws a warning', ->
+        @slimmy.convertString("""
+            - if true
+              True
+            - else
+              False
+
+            Another text.
+          """)
+        .then (compiler) ->
+          expect(compiler.warnings).to.include
+            text: 'Silent script, which execution can be an inline element, is followed by a plain text',
+            startLine: 1
+
+    context 'script followed by a plain text', ->
+      it 'throws a warning', ->
+        @slimmy.convertString("""
+            = link_to
+            Another text.
+          """)
+        .then (compiler) ->
+          expect(compiler.warnings).to.include
+            text: 'Script, which execution can be an inline element, is followed by a plain text',
+            startLine: 1
+
+    context 'silent script followed by inline tag', ->
+      it 'throws a warning', ->
+        @slimmy.convertString("""
+            - if true
+              True
+            - else
+              False
+            %span Another text.
+          """)
+        .then (compiler) ->
+          expect(compiler.warnings).to.be.eql [
+            text: 'Silent script, which execution can be an inline element, is followed by an inline tag',
+            startLine: 1
+          ]
+
+    context 'script followed by inline tag', ->
+      it 'throws a warning', ->
+        @slimmy.convertString("""
+            = link_to
+            %span Another text.
+          """)
+        .then (compiler) ->
+          expect(compiler.warnings).to.be.eql [
+            text: 'Script, which execution can be an inline element, is followed by an inline tag',
+            startLine: 1
+          ]
 
