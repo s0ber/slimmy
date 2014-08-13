@@ -326,10 +326,9 @@ describe 'Slimmy', ->
             %span Another text.
           """)
         .then (compiler) ->
-          expect(compiler.warnings).to.be.eql [
+          expect(compiler.warnings).to.include
             text: 'Silent script, which execution can be an inline element, is followed by an inline tag',
             startLine: 1
-          ]
 
     context 'script (not an inline link) followed by a plain text', ->
       it 'throws a warning', ->
@@ -349,8 +348,30 @@ describe 'Slimmy', ->
             %span Another text.
           """)
         .then (compiler) ->
-          expect(compiler.warnings).to.be.eql [
+          expect(compiler.warnings).to.include
             text: 'Script, which execution can be an inline element, is followed by an inline tag',
             startLine: 1
-          ]
+
+    context 'there is interpolated ruby code inside filter', ->
+      it 'throws a warning', ->
+        @slimmy.convertString('''
+            :javascript
+              $(\'body\').append #{some_method}
+          ''')
+        .then (compiler) ->
+          expect(compiler.warnings).to.include
+            text: 'There is interpolated ruby code inside javascript filter, which is not escaped in haml, but escaped by default in slim',
+            startLine: 1
+
+    context 'there is inline element inside silent script', ->
+      it 'throws a warning', ->
+        @slimmy.convertString("""
+            - collection.each do |item|
+              %div
+              = link_to 'Something'
+          """)
+        .then (compiler) ->
+          expect(compiler.warnings).to.include
+            text: 'There is inline element inside silent script block, which may have trailing whitespace',
+            startLine: 3
 

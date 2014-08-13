@@ -16,8 +16,14 @@ class AstNode
     @parent = node
 
   checkForWarnings: ->
+    return if @isComment()
+
     nextNode = @nextNode()
-    return if @isComment() or not nextNode?
+    unless nextNode?
+      if @isInline() and @parent?.isSilentScript()
+        return text: 'There is inline element inside silent script block, which may have trailing whitespace'
+      else
+        return
 
     warningMessage =
       if @isPlain()
@@ -48,6 +54,10 @@ class AstNode
           elName = if nextNode.isInlineLink() then 'link' else 'tag'
           "Silent script, which execution can be an inline element, is followed by an inline #{elName}"
 
+      else if @isFilter()
+        if /#{/.test(@data.text)
+          "There is interpolated ruby code inside #{@data.name} filter, which is not escaped in haml, but escaped by default in slim"
+
     if warningMessage?
       text: warningMessage
     else
@@ -65,7 +75,8 @@ class AstNode
         false
 
   isInlineLink: ->
-    isLinkHelper = @isScript() and /^\s*link_to/.test @data.text
+    return false unless @isScript()
+    isLinkHelper = /^\s*link_to/.test @data.text
     isBlock = /do(\s\|\w+\|)?$/.test @data.text
 
     isLinkHelper and not isBlock
@@ -84,6 +95,9 @@ class AstNode
 
   isPlain: ->
     @type is 'plain'
+
+  isFilter: ->
+    @type is 'filter'
 
   isComment: ->
     @type is 'silent_script' and  /^\s*#/.test @data.text
@@ -121,5 +135,8 @@ class AstNode
         prevNode = prevNode.prevNode()
 
     prevNode
+
+  isLastChild: ->
+    not @nextNode()?
 
 module.exports = AstNode

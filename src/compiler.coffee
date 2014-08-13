@@ -11,7 +11,7 @@ class Compiler
   constructor: (rootNode, @fileCompilationMode = true) ->
     @root = rootNode
     @buffer = ''
-    @_currentLine = 0
+    @_currentLine = 1
     @warnings = []
 
   compile: ->
@@ -27,6 +27,11 @@ class Compiler
 
   compileNode: (node, indLevel) ->
     @addNewLine() if @_shouldPrependWithEmptyLine(node)
+
+    warning = node.checkForWarnings?()
+    if warning?
+      warning.startLine = @currentLine()
+      @warnings.push(warning)
 
     compilationMethod = switch node.type
       when 'root'
@@ -53,11 +58,6 @@ class Compiler
     return unless compilationMethod
 
     @[compilationMethod](node, indLevel)
-
-    warning = node.checkForWarnings?()
-    if warning?
-      warning.startLine = @currentLine()
-      @warnings.push(warning)
 
   compileRoot: (node, indLevel) ->
 

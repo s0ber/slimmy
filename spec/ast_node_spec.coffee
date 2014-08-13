@@ -53,6 +53,15 @@ describe 'AstNode', ->
       expect(rootNode.children[2].prevNode().data).to.be.eql {a: 1}
       expect(rootNode.children[0].prevNode()).to.be.null
 
+  describe '#isLastChild', ->
+    it "returns true if node is a last child of it's parent", ->
+      Parser = require '../src/parser'
+      parser = new Parser()
+      rootNode = parser.buildASTree(@rootNodeJson)
+
+      expect(rootNode.children[4].isLastChild()).to.be.true
+      expect(rootNode.children[2].isLastChild()).to.be.false
+
   describe '#isInline', ->
     context 'node is plain text', ->
       it 'returns true', ->
@@ -93,6 +102,14 @@ describe 'AstNode', ->
         data: {text: ' # here is a comment'}
 
       expect(node.isComment()).to.be.true
+
+  describe '#isFilter', ->
+    it 'returns true if node is a filter', ->
+      node = new AstNode
+        type: 'filter'
+        data: {name: 'javascript'}
+
+      expect(node.isFilter()).to.be.true
 
   describe '#isInlineLink', ->
     context "node is script and it starts with 'link_to' and doesn't end with 'do'", ->
