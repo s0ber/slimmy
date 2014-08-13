@@ -2,6 +2,7 @@ Q = require 'q'
 _ = require 'underscore'
 fs = require 'fs'
 walk = require 'walk'
+Riline = require 'riline'
 
 Parser = require './parser'
 Compiler = require './compiler'
@@ -18,6 +19,7 @@ Slimmy = class
     @parser().parseString(hamlCodeString).then (rootNode) =>
       compiler = new @Compiler(rootNode, fileCompilationMode)
       compiler.compile()
+      @_showWarnings(compiler)
       compiler
 
   convertFile: (filePath, writeToFile = false) ->
@@ -26,6 +28,12 @@ Slimmy = class
     @parser().parseFile(filePath).then (rootNode) =>
       compiler = new @Compiler(rootNode)
       compiler.compile()
+
+      if writeToFile
+        @_showWarnings(compiler, filePath)
+      else
+        @_showWarnings(compiler)
+
       @_compilationResults = compiler.buffer
 
       @writeToSlimFile(filePath, compiler.buffer) if writeToFile
@@ -56,7 +64,7 @@ Slimmy = class
       )
 
   writeToSlimFile: (filePath, slimCode) ->
-    slimFilePath = filePath.replace(HAML_EXTENSION_REGEXP, '.slim')
+    slimFilePath = @getSlimPath(filePath)
 
     fd = fs.openSync(slimFilePath, 'w')
     fs.writeFileSync(slimFilePath, slimCode)
@@ -70,7 +78,25 @@ Slimmy = class
     else
       path = "#{__dirname}/../#{path}"
 
+  getSlimPath: (path) ->
+    path.replace(HAML_EXTENSION_REGEXP, '.slim')
+
   parser: ->
     @_parser ?= new @Parser()
+
+  _showWarnings: (compiler, filePath) ->
+    return unless compiler.warnings?
+    riline = new Riline(compiler.buffer)
+
+    for warning in compiler.warnings
+      text = warning.text
+      text += '\n' + @getSlimPath(filePath) if filePath
+
+      riline.addMessage
+        text: text
+        startLine: warning.startLine
+        endLine: warning.endLine
+
+    riline.printMessages()
 
 module.exports = Slimmy

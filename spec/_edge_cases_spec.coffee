@@ -46,6 +46,25 @@ describe 'Slimmy', ->
               | and one more inner string.\n
         """
 
+    it 'makes plain text node has trailing space if next node is inline link', ->
+      @slimmy.convertString("""
+          Plain text string
+          %span
+            and another string
+            = link_to 'Some link'
+            %strong and one more inner string.
+
+        """)
+      .then (compiler) ->
+        expect(compiler.buffer).to.be.equal """
+          ' Plain text string
+          span
+            ' and another string
+            => link_to 'Some link'
+            strong
+              | and one more inner string.\n
+        """
+
     it 'makes inline tag has trailing space if next node is plain text', ->
       @slimmy.convertString("""
           Plain text string
@@ -90,6 +109,101 @@ describe 'Slimmy', ->
           | and more.\n
         """
 
+    it 'makes inline tag has trailing space if next node is inline link', ->
+      @slimmy.convertString("""
+          Plain text string
+          %span
+            and another string
+            %strong and one more inner string,
+            = link_to 'Some link'
+            %i and cursiv string,
+          %em and even more,
+          and more.
+        """)
+      .then (compiler) ->
+        expect(compiler.buffer).to.be.equal """
+          ' Plain text string
+          span>
+            ' and another string
+            strong>
+              | and one more inner string,
+            => link_to 'Some link'
+            i
+              | and cursiv string,
+          em>
+            | and even more,
+          | and more.\n
+        """
+
+    it 'makes inline link has trailing space if next node is plain text', ->
+      @slimmy.convertString("""
+          Plain text string
+          %span
+            and another string
+            = link_to 'Some link'
+            and more,
+          and even more.
+        """)
+      .then (compiler) ->
+        expect(compiler.buffer).to.be.equal """
+          ' Plain text string
+          span>
+            ' and another string
+            => link_to 'Some link'
+            | and more,
+          | and even more.\n
+        """
+
+    it 'makes inline link has trailing space if next node is inline tag', ->
+      @slimmy.convertString("""
+          Plain text string
+          %span
+            and another string
+            %strong and one more inner string,
+            = link_to 'Some link'
+            %i and cursiv string,
+          %em and even more,
+          and more.
+        """)
+      .then (compiler) ->
+        expect(compiler.buffer).to.be.equal """
+          ' Plain text string
+          span>
+            ' and another string
+            strong>
+              | and one more inner string,
+            => link_to 'Some link'
+            i
+              | and cursiv string,
+          em>
+            | and even more,
+          | and more.\n
+        """
+
+    it 'makes inline link has trailing space if next node is inline link', ->
+      @slimmy.convertString("""
+          Plain text string
+          %span
+            and another string
+            %strong and one more inner string,
+            and more,
+            = link_to 'Some link,'
+            = link_to 'Some another link'
+          and even more.
+        """)
+      .then (compiler) ->
+        expect(compiler.buffer).to.be.equal """
+          ' Plain text string
+          span>
+            ' and another string
+            strong>
+              | and one more inner string,
+            ' and more,
+            => link_to 'Some link,'
+            = link_to 'Some another link'
+          | and even more.\n
+        """
+
   describe 'Warnings', ->
     context 'plain text followed by silent script', ->
       it 'throws a warning', ->
@@ -112,7 +226,7 @@ describe 'Slimmy', ->
             %div
               Some text in div.
             Plain text string
-            = link_to ...
+            = some_helper
             Another text.
             And more text.
           """)
@@ -146,13 +260,46 @@ describe 'Slimmy', ->
             And more text.
             %span
               Some text in div.
-            = link_to ...
+            = some_helper
             Another text.
           """)
         .then (compiler) ->
           expect(compiler.warnings).to.include
             text: 'Inline tag is followed by a script, which execution result can be an inline element',
             startLine: 3
+
+    context 'inline link followed by silent script', ->
+      it 'throws a warning', ->
+        @slimmy.convertString("""
+            Text here.
+            = link_to 'Some link'
+            - if true
+              True
+            - else
+              False
+            Another text.
+            And more text.
+          """)
+        .then (compiler) ->
+          expect(compiler.warnings).to.be.include
+            text: 'Inline link is followed by a silent script, which execution result can be an inline element',
+            startLine: 2
+
+    context 'inline link followed by script', ->
+      it 'throws a warning', ->
+        @slimmy.convertString("""
+            Text here.
+            And more text.
+            %span
+              Some text in div.
+            = link_to ...
+            = some_helper
+            Another text.
+          """)
+        .then (compiler) ->
+          expect(compiler.warnings).to.include
+            text: 'Inline link is followed by a script, which execution result can be an inline element',
+            startLine: 5
 
     context 'silent script followed by a plain text', ->
       it 'throws a warning', ->
@@ -167,17 +314,6 @@ describe 'Slimmy', ->
         .then (compiler) ->
           expect(compiler.warnings).to.include
             text: 'Silent script, which execution can be an inline element, is followed by a plain text',
-            startLine: 1
-
-    context 'script followed by a plain text', ->
-      it 'throws a warning', ->
-        @slimmy.convertString("""
-            = link_to
-            Another text.
-          """)
-        .then (compiler) ->
-          expect(compiler.warnings).to.include
-            text: 'Script, which execution can be an inline element, is followed by a plain text',
             startLine: 1
 
     context 'silent script followed by inline tag', ->
@@ -195,10 +331,21 @@ describe 'Slimmy', ->
             startLine: 1
           ]
 
-    context 'script followed by inline tag', ->
+    context 'script (not an inline link) followed by a plain text', ->
       it 'throws a warning', ->
         @slimmy.convertString("""
-            = link_to
+            = some_helper
+            Another text.
+          """)
+        .then (compiler) ->
+          expect(compiler.warnings).to.include
+            text: 'Script, which execution can be an inline element, is followed by a plain text',
+            startLine: 1
+
+    context 'script (not an inline link) followed by inline tag', ->
+      it 'throws a warning', ->
+        @slimmy.convertString("""
+            = some_helper
             %span Another text.
           """)
         .then (compiler) ->
