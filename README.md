@@ -4,7 +4,35 @@ Slimmy
 
 ## Usage
 
-Will be added soon. Package is in development stage. The only requirement is **haml** gem being installed.
+Create slimmy instance.
+
+```
+Slimmy = require 'slimmy'
+slimmy = new Slimmy()
+```
+
+You then can convert file.
+
+```
+slimmy.convertFile('~/my_rails_app/app/views/layouts/application.html.haml', true)
+```
+
+Or the whole directory (recursively).
+
+```
+slimmy.convertDir('~/my_rails_app/app/views/', true)
+```
+
+Or just a string.
+
+```
+filePath = '~/my_rails_app/app/views/layouts/application.html.haml'
+hamlString = require('fs').readFileSync(filePath).toString()
+
+slimmy.convertString(hamlString).then (compiler) ->
+  # then we can access compiler's buffer
+  console.log(compiler.buffer)
+```
 
 ## Development
 
