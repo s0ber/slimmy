@@ -14,13 +14,13 @@ slimmy = new Slimmy()
 You then can convert file.
 
 ```
-slimmy.convertFile('~/my_rails_app/app/views/layouts/application.html.haml', true)
+slimmy.convertFile('~/my_rails_app/app/views/layouts/application.html.haml')
 ```
 
 Or the whole directory (recursively).
 
 ```
-slimmy.convertDir('~/my_rails_app/app/views/', true)
+slimmy.convertDir('~/my_rails_app/app/views/')
 ```
 
 Or just a string.

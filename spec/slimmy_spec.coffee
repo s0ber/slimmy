@@ -36,12 +36,12 @@ describe 'Slimmy', ->
       slimmy = new Slimmy()
 
       sinon.spy(slimmy, 'convertFile')
-      slimmy.convertDir('./spec/fixtures/folder').then ->
+      slimmy.convertDir('./spec/fixtures/folder', false).then ->
         expect(slimmy.convertFile.callCount).to.be.equal(filesNumber)
 
   describe '#convertFile', ->
     it 'at first parses provided file and then compiles slim from recieved ASTree', ->
-      @slimmy.convertFile('./spec/fixtures/haml_document.haml').then =>
+      @slimmy.convertFile('./spec/fixtures/haml_document.haml', false).then =>
         expect(@slimmy.Parser::parseFile).to.be.calledOnce
         expect(@slimmy.Compiler.lastCall.args).to.be.eql [@rootNode]
         expect(@slimmy.Compiler::compile).to.be.calledOnce
@@ -50,7 +50,7 @@ describe 'Slimmy', ->
     # not actual test case, just printing compiled (to slim) haml document to console
     it 'logs compiled fixture to console', ->
       slimmy = new Slimmy()
-      slimmy.convertFile('./spec/fixtures/haml_document.haml').then ->
+      slimmy.convertFile('./spec/fixtures/haml_document.haml', false).then ->
         # console.log('\n')
         # console.log(slimmy._compilationResults)
 

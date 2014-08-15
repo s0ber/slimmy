@@ -22,7 +22,7 @@ Slimmy = class
       @_showWarnings(compiler)
       compiler
 
-  convertFile: (filePath, writeToFile = false) ->
+  convertFile: (filePath, writeToFile = true) ->
     filePath = @getAbsolutePath(filePath)
 
     @parser().parseFile(filePath).then (rootNode) =>
@@ -38,7 +38,7 @@ Slimmy = class
 
       @writeToSlimFile(filePath, compiler.buffer) if writeToFile
 
-  convertDir: (dirPath, writeToFile = false) ->
+  convertDir: (dirPath, writeToFile = true) ->
     dirPath = @getAbsolutePath(dirPath)
     files = []
 
