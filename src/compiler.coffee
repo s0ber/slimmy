@@ -1,9 +1,13 @@
+try
+  config = require './config'
+catch
+  config = require './config.example'
+
 _ = require 'underscore'
 
 INDENTATION = "  "
 IND_LEVEL = 0
 LINE_BREAK = '\n'
-MAIN_TAGS = 'body footer'.split(' ')
 MID_BLOCK_KEYWORDS = 'else elsif rescue ensure end when'.split(' ')
 
 class Compiler
@@ -26,7 +30,8 @@ class Compiler
       @compileChildrenNodes(child, indLevel + 1)
 
   compileNode: (node, indLevel) ->
-    @addNewLine() if @_shouldPrependWithEmptyLine(node)
+    if @fileCompilationMode and @currentLine() isnt 1
+      @addNewLine() if @_shouldPrependWithEmptyLine(node)
 
     warning = node.checkForWarnings?()
     if warning?
@@ -93,8 +98,6 @@ class Compiler
     @addNewLine()
 
   compileSilentScript: (node, indLevel) ->
-    isComment = /^ #/.test(node.data.text)
-    @addNewLine() if isComment
     isMidBlockKeyword = node.data.keyword? and MID_BLOCK_KEYWORDS.indexOf(node.data.keyword) isnt -1
 
     indent =
@@ -232,7 +235,7 @@ class Compiler
     hashes
 
   _shouldPrependWithEmptyLine: (node) ->
-    return unless @fileCompilationMode
-    node.type is 'tag' and node.data? and MAIN_TAGS.indexOf(node.data.name) isnt -1
+    return if not @fileCompilationMode or not config?
+    config.shouldPrependWithEmptyLine(node)
 
 module.exports = Compiler
