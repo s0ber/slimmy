@@ -384,12 +384,14 @@ describe 'Compiler', ->
       hashes = [
         "class: 'my_class', data: {attr: 'value', another_attr: 'another_value'}"
         "class: 'my_class',\ndata: {attr: 'value',\nanother_attr: 'another_value'}"
+        "class: 'my_class', data: {disabled: true, attr: 'value', another_attr: 'another_value'}, disabled: 'disabled'"
         "class: ['my_class', 'my_another_class']"
       ]
 
       expect(@compiler.compileAttrsHashes(hashes)).to.be.eql [
-        "class='my_class' data={attr: 'value', another_attr: 'another_value'}",
         "class='my_class' data={attr: 'value', another_attr: 'another_value'}"
+        "class='my_class' data={attr: 'value', another_attr: 'another_value'}"
+        "class='my_class' data={disabled: true, attr: 'value', another_attr: 'another_value'} disabled='disabled'"
         "class=['my_class', 'my_another_class']"
       ]
 

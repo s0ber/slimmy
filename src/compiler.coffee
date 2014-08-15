@@ -195,27 +195,38 @@ class Compiler
     @_currentLine++
 
   compileAttrsHashes: (hashes = []) ->
-    hashes = _.map(hashes, (attributesHash) ->
-      attributesHash = attributesHash.replace(/\n/g, ' ')
+    hashes = _.map(hashes, (attrsHash) ->
+      attrsHash = attrsHash.replace(/\n/g, ' ')
+      newAttrsHash = ''
+      insideBrackets = false
+      skipChar = false
 
-      attributes = attributesHash.replace(/'/g, '"')
-        .replace(/(\w+):/g, "\"$1\":")
+      for i in [0...attrsHash.length]
+        if skipChar
+          skipChar = false
+          continue
 
-      attributes = JSON.parse "{#{attributes}}"
-      firstLevelKeys = _.keys(attributes)
+        char = attrsHash[i]
+        nextChar = attrsHash[i + 1]
 
-      for key in firstLevelKeys
-        regExp = new RegExp("(, )*#{key}: ")
-        matcher = attributesHash.match(regExp)
-        hasComma = matcher[1]?
+        if not insideBrackets and '[{("\''.indexOf(char) isnt -1
+          insideBrackets = true
+        else if insideBrackets and ']})"\''.indexOf(char) isnt -1
+          insideBrackets = false
 
-        attributesHash =
-          if hasComma
-            attributesHash.replace(", #{key}: ", " #{key}=")
-          else
-            attributesHash.replace("#{key}: ", "#{key}=")
+        unless insideBrackets
+          if "#{char}#{nextChar}" is ': '
+            newAttrsHash += '='
+            skipChar = true
+            continue
+          else if "#{char}#{nextChar}" is ', '
+            newAttrsHash += ' '
+            skipChar = true
+            continue
 
-      attributesHash
+        newAttrsHash += char
+
+      newAttrsHash
     )
 
     hashes
