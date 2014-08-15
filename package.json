@@ -4,8 +4,7 @@
   "description": "Haml to Slim converter, written in coffeescript...",
   "main": "lib/slimmy.js",
   "scripts": {
-    "test": "gulp --require coffee-script/register mocha:ci",
-    "prepublish": "gulp --require coffee-script/register release"
+    "test": "gulp --require coffee-script/register mocha:ci"
   },
   "repository": {
     "type": "git",
