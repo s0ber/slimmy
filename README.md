@@ -6,26 +6,26 @@ Slimmy
 
 Create slimmy instance.
 
-```
+```coffee
 Slimmy = require 'slimmy'
 slimmy = new Slimmy()
 ```
 
 You then can convert file.
 
-```
+```coffee
 slimmy.convertFile('~/my_rails_app/app/views/layouts/application.html.haml')
 ```
 
 Or the whole directory (recursively).
 
-```
+```coffee
 slimmy.convertDir('~/my_rails_app/app/views/')
 ```
 
 Or just a string.
 
-```
+```coffee
 filePath = '~/my_rails_app/app/views/layouts/application.html.haml'
 hamlString = require('fs').readFileSync(filePath).toString()
 
