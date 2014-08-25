@@ -38,7 +38,7 @@ Slimmy = class
 
       @writeToSlimFile(filePath, compiler.buffer) if writeToFile
 
-  convertDir: (dirPath, writeToFile = true) ->
+  convertDir: (dirPath, writeToFile = true, removeHamlFiles = false) ->
     dirPath = @getAbsolutePath(dirPath)
     files = []
 
@@ -52,9 +52,10 @@ Slimmy = class
 
     console.log "Converting files:"
     Q
-      .allSettled(_.map(files, (file) =>
-        console.log(file)
-        @convertFile(file, writeToFile)
+      .allSettled(_.map(files, (filePath) =>
+        console.log(filePath)
+        @convertFile(filePath, writeToFile).then =>
+          @deleteHamlFile(filePath) if removeHamlFiles
       ))
       .catch((e) ->
         console.log e
@@ -80,6 +81,9 @@ Slimmy = class
 
   getSlimPath: (path) ->
     path.replace(HAML_EXTENSION_REGEXP, '.slim')
+
+  deleteHamlFile: (filePath) ->
+    fs.unlink(filePath)
 
   parser: ->
     @_parser ?= new @Parser()
