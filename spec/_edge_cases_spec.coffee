@@ -68,7 +68,7 @@ describe 'Slimmy', ->
     it 'makes inline tag has trailing space if next node is plain text', ->
       @slimmy.convertString("""
           Plain text string
-          %span
+          %span.with_class
             and another string
             %strong and one more inner string,
             and more,
@@ -77,7 +77,7 @@ describe 'Slimmy', ->
       .then (compiler) ->
         expect(compiler.buffer).to.be.equal """
           ' Plain text string
-          span>
+          span.with_class>
             ' and another string
             strong>
               | and one more inner string,

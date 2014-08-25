@@ -119,15 +119,16 @@ class Compiler
           ''
     else
       tag = "#{node.data.name}"
-      nextNode = node.nextNode?()
-      if node.isInline?() and nextNode?.isInline()
-        tag += '>'
 
     for key, value of node.data.attributes
       if key is 'class'
         tag += '.' + value.split(' ').join('.')
       else if key is 'id'
         tag += '#' + value
+
+    nextNode = node.nextNode?()
+    if node.isInline?() and nextNode?.isInline()
+      tag += '>'
 
     @buffer += @getIndent(indLevel) + tag
     attrsHashes =  @compileAttrsHashes(node.data.attributes_hashes)

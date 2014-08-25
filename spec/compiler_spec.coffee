@@ -355,7 +355,7 @@ describe 'Compiler', ->
         expect(@compiler.buffer).to.be.equal 'OLOLO\n'
 
   describe '#compileAttrsHash', ->
-    it.only 'compiles attributes hashes into slim format', ->
+    it 'compiles attributes hashes into slim format', ->
       hashes = [
         "class: 'my_class', data: {attr: 'value', another_attr: 'another_value'}"
         "class: 'my_class',\ndata: {attr: 'value',\nanother_attr: 'another_value'}"
