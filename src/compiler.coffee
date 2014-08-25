@@ -208,6 +208,7 @@ class Compiler
           skipChar = false
           continue
 
+        prevChar = attrsHash[i - 1] || ''
         char = attrsHash[i]
         nextChar = attrsHash[i + 1]
 
@@ -217,7 +218,7 @@ class Compiler
           insideBrackets = false
 
         unless insideBrackets
-          if "#{char}#{nextChar}" is ': '
+          if "#{char}#{nextChar}" is ': ' and prevChar isnt ' '
             newAttrsHash += '='
             skipChar = true
             continue
