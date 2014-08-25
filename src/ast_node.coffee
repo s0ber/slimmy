@@ -142,4 +142,17 @@ class AstNode
   isLastChild: ->
     not @nextNode()?
 
+  hasClass: (classes) ->
+    hasClass = false
+    return hasClass if not @type is 'tag' or not @data?.attributes?.class?
+
+    nodeClasses = @data.attributes.class.split(' ')
+    for klass in classes
+      if nodeClasses.indexOf(klass) isnt -1
+        hasClass = true
+        break
+
+    hasClass
+
+
 module.exports = AstNode

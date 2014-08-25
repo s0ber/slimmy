@@ -63,6 +63,9 @@ class Compiler
 
     @[compilationMethod](node, indLevel)
 
+    if @fileCompilationMode
+      @addNewLine() if @_shouldAppendEmptyLine(node)
+
   compileRoot: (node, indLevel) ->
 
   compilePlain: (node, indLevel) ->
@@ -247,5 +250,9 @@ class Compiler
   _shouldPrependWithEmptyLine: (node) ->
     return if not @fileCompilationMode or not config?
     config.shouldPrependWithEmptyLine(node)
+
+  _shouldAppendEmptyLine: (node) ->
+    return if not @fileCompilationMode or not config?
+    config.shouldAppendEmptyLine(node)
 
 module.exports = Compiler
