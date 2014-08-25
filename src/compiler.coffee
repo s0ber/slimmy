@@ -199,8 +199,10 @@ class Compiler
   compileAttrsHashes: (hashes = []) ->
     hashes = _.map(hashes, (attrsHash) ->
       attrsHash = attrsHash.replace(/\n/g, ' ')
+      attrsHash = attrsHash.replace(/(\w+\s\?\s'.+'\s:\s'.+?')/g, '($1)')
       newAttrsHash = ''
       insideBrackets = false
+      insideHash = false
       skipChar = false
 
       for i in [0...attrsHash.length]
@@ -213,9 +215,16 @@ class Compiler
         nextChar = attrsHash[i + 1]
 
         if not insideBrackets and '[{("\''.indexOf(char) isnt -1
+          if char is '{'
+            insideHash = true
           insideBrackets = true
         else if insideBrackets and ']})"\''.indexOf(char) isnt -1
-          insideBrackets = false
+          if insideHash
+            if char is '}'
+              insideHash = false
+              insideBrackets = false
+          else
+            insideBrackets = false
 
         unless insideBrackets
           if "#{char}#{nextChar}" is ': ' and prevChar isnt ' '

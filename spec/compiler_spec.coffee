@@ -355,13 +355,15 @@ describe 'Compiler', ->
         expect(@compiler.buffer).to.be.equal 'OLOLO\n'
 
   describe '#compileAttrsHash', ->
-    it 'compiles attributes hashes into slim format', ->
+    it.only 'compiles attributes hashes into slim format', ->
       hashes = [
         "class: 'my_class', data: {attr: 'value', another_attr: 'another_value'}"
         "class: 'my_class',\ndata: {attr: 'value',\nanother_attr: 'another_value'}"
         "class: 'my_class', data: {disabled: true, attr: 'value', another_attr: 'another_value'}, disabled: 'disabled'"
         "class: ['my_class', 'my_another_class']"
         "class: a ? 'my_class' : 'not_my_class', data: {disabled: true, attr: 'value', another_attr: 'another_value'}"
+        "class: has_types ? 'js-view-type_item' : 'js-view-item', data: {form_url: profile_walkthrough_new_item_url}"
+        "class: ('has-numbers' if has_numbers), data: {id: item.id, preferred_name: item.has_preferred? ? item.preferred_tag_name : '', url: profile_walkthrough_item_url(item), form_url: profile_walkthrough_edit_item_url(item), sort_by: item.sort_by.to_json}"
       ]
 
       expect(@compiler.compileAttrsHashes(hashes)).to.be.eql [
@@ -369,6 +371,8 @@ describe 'Compiler', ->
         "class='my_class' data={attr: 'value', another_attr: 'another_value'}"
         "class='my_class' data={disabled: true, attr: 'value', another_attr: 'another_value'} disabled='disabled'"
         "class=['my_class', 'my_another_class']"
-        "class=a ? 'my_class' : 'not_my_class' data={disabled: true, attr: 'value', another_attr: 'another_value'}"
+        "class=(a ? 'my_class' : 'not_my_class') data={disabled: true, attr: 'value', another_attr: 'another_value'}"
+        "class=(has_types ? 'js-view-type_item' : 'js-view-item') data={form_url: profile_walkthrough_new_item_url}"
+        "class=('has-numbers' if has_numbers) data={id: item.id, preferred_name: item.has_preferred? ? item.preferred_tag_name : '', url: profile_walkthrough_item_url(item), form_url: profile_walkthrough_edit_item_url(item), sort_by: item.sort_by.to_json}"
       ]
 
