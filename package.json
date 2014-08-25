@@ -1,6 +1,6 @@
 {
   "name": "slimmy",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Haml to Slim converter, written in coffeescript...",
   "main": "lib/slimmy.js",
   "scripts": {
