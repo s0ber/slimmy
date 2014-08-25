@@ -90,6 +90,9 @@ class AstNode
   isMidBlockKeyword: ->
     MID_BLOCK_KEYWORDS.indexOf(@data.keyword) isnt -1
 
+  isIfKeyword: ->
+    @isSilentScript() and @data.keyword is 'if'
+
   isScript: ->
     @type is 'script'
 

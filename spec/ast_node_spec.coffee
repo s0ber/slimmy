@@ -87,6 +87,14 @@ describe 'AstNode', ->
 
       expect(node.isSilentScript()).to.be.true
 
+  describe '#isIfKeyword', ->
+    it 'returns true if node is if keyword', ->
+      node = new AstNode
+        type: 'silent_script'
+        data: {keyword: 'if'}
+
+      expect(node.isSilentScript()).to.be.true
+
   describe '#isScript', ->
     it 'returns true if node is script', ->
       node = new AstNode
