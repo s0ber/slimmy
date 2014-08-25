@@ -42,8 +42,7 @@ describe 'Compiler', ->
           .test_another_el_1
           .test_another_el_2
             .test_another_el_3
-            .test_another_el_4
-\n
+            .test_another_el_4\n
         """
 
   describe '#compileNode', ->

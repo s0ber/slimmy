@@ -17,9 +17,9 @@ describe 'Slimmy', ->
           head
 
           body#unique.page.js-app-page_wrapper class='my_class' data={attr: 'value', another_attr: 'another_value'}
-            | Some text here.
-          \n
+            | Some text here.\n
           """
+
     it 'prepends compiled code with empty line if silent script is a comment', ->
       @slimmy.convertString("""
         %div
@@ -30,7 +30,6 @@ describe 'Slimmy', ->
         expect(compiler.buffer).to.be.equal """
           div
 
-          - # it is comment
-          \n
+          - # it is comment\n
           """
 

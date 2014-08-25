@@ -21,7 +21,6 @@ class Compiler
   compile: ->
     @compileNode(@root, IND_LEVEL)
     @compileChildrenNodes(@root, IND_LEVEL)
-    @addNewLine() if @fileCompilationMode
 
   compileChildrenNodes: (node, indLevel) ->
     return unless node.children
