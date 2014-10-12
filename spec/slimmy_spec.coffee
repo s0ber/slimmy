@@ -39,6 +39,16 @@ describe 'Slimmy', ->
       slimmy.convertDir('./spec/fixtures/folder', false).then ->
         expect(slimmy.convertFile.callCount).to.be.equal(filesNumber)
 
+  describe '#removeHamlFromDir', ->
+    xit 'remove all haml files in a dir', ->
+      @timeout(10000)
+      filesNumber = 8
+      slimmy = new Slimmy()
+
+      sinon.spy(slimmy, 'deleteHamlFile')
+      slimmy.removeHamlFromDir('./spec/fixtures/folder')
+      expect(slimmy.deleteHamlFile.callCount).to.be.equal(filesNumber)
+
   describe '#convertFile', ->
     it 'at first parses provided file and then compiles slim from recieved ASTree', ->
       @slimmy.convertFile('./spec/fixtures/haml_document.haml', false).then =>

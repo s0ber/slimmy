@@ -38,7 +38,7 @@ Slimmy = class
 
       @writeToSlimFile(filePath, compiler.buffer) if writeToFile
 
-  convertDir: (dirPath, writeToFile = true, removeHamlFiles = false) ->
+  convertDir: (dirPath, writeToFile = true) ->
     dirPath = @getAbsolutePath(dirPath)
     files = []
 
@@ -54,8 +54,7 @@ Slimmy = class
     Q
       .allSettled(_.map(files, (filePath) =>
         console.log(filePath)
-        @convertFile(filePath, writeToFile).then =>
-          @deleteHamlFile(filePath) if removeHamlFiles
+        @convertFile(filePath, writeToFile)
       ))
       .catch((e) ->
         console.log e
@@ -63,6 +62,23 @@ Slimmy = class
       .then(->
         console.log 'All files are converted.'
       )
+
+  removeHamlFromDir: (dirPath) ->
+    dirPath = @getAbsolutePath(dirPath)
+    files = []
+
+    walker = walk.walkSync(dirPath,
+      followLinks: false
+      listeners:
+        file: (root, stat, next) ->
+          files.push "#{root}/#{stat.name}" if HAML_EXTENSION_REGEXP.test(stat.name)
+          next()
+    )
+
+    console.log "Removing files:"
+    for filePath in files
+      console.log(filePath)
+      @deleteHamlFile(filePath)
 
   writeToSlimFile: (filePath, slimCode) ->
     slimFilePath = @getSlimPath(filePath)

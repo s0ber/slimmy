@@ -202,27 +202,24 @@ class Compiler
 
   compileAttrsHashes: (hashes = []) ->
     hashes = _.map(hashes, (attrsHash) ->
+      # remove line breaks
       attrsHash = attrsHash.replace(/\n/g, ' ')
+      # put ternary operators expressions in brackets
       attrsHash = attrsHash.replace(/(\w+\s\?\s'.+'\s:\s'.+?')/g, '($1)')
       newAttrsHash = ''
       insideBrackets = false
       insideHash = false
-      skipChar = false
 
       for i in [0...attrsHash.length]
-        if skipChar
-          skipChar = false
-          continue
-
         prevChar = attrsHash[i - 1] || ''
         char = attrsHash[i]
         nextChar = attrsHash[i + 1]
 
-        if not insideBrackets and '[{("\''.indexOf(char) isnt -1
+        if not insideBrackets and '[{('.indexOf(char) isnt -1
           if char is '{'
             insideHash = true
           insideBrackets = true
-        else if insideBrackets and ']})"\''.indexOf(char) isnt -1
+        else if insideBrackets and ']})'.indexOf(char) isnt -1
           if insideHash
             if char is '}'
               insideHash = false
@@ -233,11 +230,15 @@ class Compiler
         unless insideBrackets
           if "#{char}#{nextChar}" is ': ' and prevChar isnt ' '
             newAttrsHash += '='
-            skipChar = true
+            # _i - coffeescript reference to cycle counter
+            # here we are skipping a character
+            i = _i++
             continue
           else if "#{char}#{nextChar}" is ', '
             newAttrsHash += ' '
-            skipChar = true
+            # _i - coffeescript reference to cycle counter
+            # here we are skipping a character
+            i = _i++
             continue
 
         newAttrsHash += char
