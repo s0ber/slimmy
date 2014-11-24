@@ -1,4 +1,4 @@
-Slimmy = require './src/slimmy'
+Slimmy = require '../src/slimmy'
 slimmy = new Slimmy()
 
 dirPath = process.argv[2]
