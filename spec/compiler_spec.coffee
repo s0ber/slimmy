@@ -332,7 +332,7 @@ describe 'Compiler', ->
             "text": ".my_class.is-blue\n  color: blue\n\n"
 
         expect(@compiler.buffer).to.be.equal """
-          :sass
+          sass:
             .my_class.is-blue
               color: blue
           \n

@@ -177,7 +177,7 @@ class Compiler
     strings = _.map strings, (string) =>
       @getIndent(indLevel) + INDENTATION + string
 
-    @buffer += @getIndent(indLevel) + ":#{node.data.name}"
+    @buffer += @getIndent(indLevel) + "#{node.data.name}:"
     @addNewLine()
 
     for str in strings
