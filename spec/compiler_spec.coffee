@@ -100,7 +100,7 @@ describe 'Compiler', ->
             "text": '"Some #{a} here."'
 
         expect(@compiler.buffer).to.be.equal '''
-          Some #{a} here.\n
+          | Some #{a} here.\n
           '''
 
     context 'node is silent script node', ->

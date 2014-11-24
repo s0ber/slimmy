@@ -86,7 +86,7 @@ class Compiler
     isInterpolatedString = node.data.text[0] is '"' and node.data.text[scriptLen - 1] is '"'
 
     if isInterpolatedString
-      @buffer += @getIndent(indLevel) + node.data.text.substr(1, scriptLen - 2)
+      @buffer += @getIndent(indLevel) + '| ' + node.data.text.substr(1, scriptLen - 2)
     else
       nextNode = node.nextNode?()
       scriptPrefix =
