@@ -205,7 +205,8 @@ class Compiler
       # remove line breaks
       attrsHash = attrsHash.replace(/\n/g, ' ')
       # put ternary operators expressions in brackets
-      attrsHash = attrsHash.replace(/(\w+\s\?\s'.+'\s:\s'.+?')/g, '($1)')
+      # only those, which are not inside brackets
+      attrsHash = attrsHash.replace(/(\w+\s\?\s'.+'\s:\s'.+?')(?!\))/g, '($1)')
       newAttrsHash = ''
       insideBrackets = false
       insideHash = false

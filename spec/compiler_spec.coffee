@@ -364,6 +364,7 @@ describe 'Compiler', ->
         "class: a ? 'my_class' : 'not_my_class', data: {disabled: true, attr: 'value', another_attr: 'another_value'}"
         "class: has_types ? 'js-view-type_item' : 'js-view-item', data: {form_url: profile_walkthrough_new_item_url}"
         "class: ('has-numbers' if has_numbers), data: {id: item.id, preferred_name: item.has_preferred? ? item.preferred_tag_name : '', url: profile_walkthrough_item_url(item), form_url: profile_walkthrough_edit_item_url(item), sort_by: item.sort_by.to_json}"
+        "data: {is_performer: (watcher == task.performer ? 'true' : 'false'), user_id: watcher.id}"
       ]
 
       expect(@compiler.compileAttrsHashes(hashes)).to.be.eql [
@@ -374,5 +375,6 @@ describe 'Compiler', ->
         "class=(a ? 'my_class' : 'not_my_class') data={disabled: true, attr: 'value', another_attr: 'another_value'}"
         "class=(has_types ? 'js-view-type_item' : 'js-view-item') data={form_url: profile_walkthrough_new_item_url}"
         "class=('has-numbers' if has_numbers) data={id: item.id, preferred_name: item.has_preferred? ? item.preferred_tag_name : '', url: profile_walkthrough_item_url(item), form_url: profile_walkthrough_edit_item_url(item), sort_by: item.sort_by.to_json}"
+        "data={is_performer: (watcher == task.performer ? 'true' : 'false'), user_id: watcher.id}"
       ]
 
