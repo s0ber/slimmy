@@ -15,12 +15,6 @@ class Parser
     @_execHamlStringParsing(hamlString).then (data) =>
       @buildASTree(data)
 
-  buildASTreeeeeee: (data) ->
-    rootNode = @convertDataToAstNode(data)
-    @setChildrenForAstNode(rootNode, data.children)
-
-    rootNode
-
   buildASTree: (data) ->
     rootNode = @convertDataToAstNode(data)
     @setChildrenForAstNode(rootNode, data.children)
