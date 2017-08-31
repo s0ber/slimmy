@@ -40,7 +40,7 @@ class Parser
     dfd = Q.defer()
     exec = require('child_process').exec
 
-    child = exec(@_hamlParseFileCmd(filePath), (error, output) =>
+    child = exec(@_hamlParseFileCmd(filePath), (error, output) ->
       dfd.resolve(JSON.parse(output))
     ).on('exit', (code) ->
       child.kill()
@@ -59,7 +59,7 @@ class Parser
     dfd = Q.defer()
     exec = require('child_process').exec
 
-    child = exec(@_hamlParseStringCmd(hamlString), (error, output) =>
+    child = exec(@_hamlParseStringCmd(hamlString), (error, output) ->
       dfd.resolve(JSON.parse(output))
     ).on('exit', (code) ->
       child.kill()
